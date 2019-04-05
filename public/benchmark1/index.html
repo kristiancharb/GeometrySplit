@@ -1,9 +1,120 @@
-<!DOCTYPE html>
 <html>
-  <head>
-    <title>Welcome to Firebase Hosting</title>
-  </head>
-  <body>
-    Hello welcome to benchmark1
-  </body>
+ <head>
+  <title>GeometrySplit Game Design Document</title>
+  <link rel="stylesheet" type="text/css" href="../css/homepage.css" />
+  <link rel="stylesheet" type="text/css" href="../css/GloomyOutlook.css" />
+ </head>
+
+ <body>
+
+<h1 style="width:750px" align="center">
+  GeometrySplit
+</h1>
+ <h2 style="width:750px" align="center">
+  Game Design Document
+ </h2>
+
+ <h4 style="width:750px" align="center">
+  by Kristian Charbonneau, Henry Long, and Hong Jie Cen
+ </h4>
+
+<div id="content">
+
+  <h3>INTRODUCTION</h3>
+
+  <p>The purpose of this document is to describe GeometrySplit, a game created for CSE380. It is a 2D platformer whose purpose is to combine elements of co-op gameplay into a single player game. This is achieved through the gameplay mechanic of splitting one playable character into multiple. </p>
+<br />
+
+  <h3>TECHNOLOGY</h3>
+  <p> GeometrySplit will be playable through a web browser. The core of game will be developed using Phaser, a HTML5 game framework. The levels will be created using the Tiled map editor.</p>
+<br />
+
+  <h3>BACK STORY</h3>
+  <p> You are Test Subject 117, the first successful experiment by Incorporated Inc. to inject consciousness into a geometric host. You realize the experiments lead to some nasty side-effects, such as giving you the ability to split up your body. However, you still don’t have the capacity to multitask so your mind can occupy only one “piece” of your body. You decide you need to escape this terrifying geometric world and realize you can use those side effects to your advantage. </p>
+<br />
+
+  <h3>OBJECTIVE</h3>
+  <p> The squares goal is to navigate a minimal geometric world. The one catch is he enters a level as a single cohesive square and he must leave it as a single square. Between the start and the end, he can split up into as many small squares as necessary to get to the end zone.</p>
+<br />
+
+  <h3>GAMEPLAY</h3>
+  <p> The game will be a 2D platformer and the goal is to get from one end of the level to another. At any point in time, the player can choose to split up the current square into two squares half the size of the original one or merge two equally sized squares into a larger one. The split action can be performed up to 2 times, resulting in a total of 4 playable characters at once to cycle through. The level can only be completed as a single square.</p>
+  <p> At the beginning of the level, the player will be unable to reach the end without splitting. After splitting, each resulting character will have the opportunity to interact with the environment to open up a path for the other piece(s) of the character. To open up a path all the way to the end of the level for all squares might require splitting more than once. </p>
+  <p>Along the way the player will encounter enemy squares (red) that will pace back and forth on the platforms. These will also vary in size like the player “pieces” and can only be killed by the player if the player is bigger. Making contact with any of the player squares will kill the square and return the player back to the start of the level. </p>
+  <p>Player Interactions with the Environment/Level: </p>
+  <ul>
+    <li>Pressing Button: A player can press down large buttons on the ground. Pushing down a button can open a door or create a platform to jump on elsewhere in the level. This would allow the player to reach parts of the level that were previously unreachable.</li>
+    <li>Light Filter: A ray of light that only allows squares of a specific color to get through. To pass through, the player would need to change color.</li>
+    <li>Weighted Platform: A platform that will collapse if a square that is too big walks over it. The solution would be to split into smaller squares to pass over the platform. </li>
+    <li>Solo Zones: Marked areas that can only be occupied by a single piece of the character at a time.  </li>
+    <li>Enemies: Can be killed by jumping on them if you’re bigger </li>
+    <li>Color Switch: Platform to walk on to switch colors </li>
+
+  </ul>
+
+<br />
+
+  <h3>CONTROLS</h3>
+
+  <p>The player will be able to move around the currently selected character using W, A, and D, such W would be jump, and A and D would be moving left and right respectively. The player would be able to cycle through any split squares using Q and E to go to next and previous piece, respectively. The R button would allow the player to split into smaller squares. The player would also be able to interact with the environment with the left click.</p>
+
+<br />
+
+  <h3>GRAPHICAL USER INTERFACE</h3>
+  <p>Upon startup of the game, the user would see the title of the game be displayed for a couple seconds and then it would transition into the main menu screen, which would contain the options to start the game, select a level, see the controls, and learn more about the game. The level select page makes only completed levels and the current level available. While the player is playing the game, there should be a pause button. Upon pressing the pause button, the player is given the options to resume, see controls, or return to main menu.</p>
+  <h4> Splash Page </h4>
+  <img src="GS_Splash.png" width="500">
+  <h4> Main Menu </h4>
+  <img src="GS_Menu.png" width="500">
+  <h4> Level Selection </h4>
+  <img src="GS_LevelSelect.png" width="500">
+  <h4> Controls Page </h4>
+  <img src="GS_Controls_v2.png" width="500">
+
+
+  <h3>ARTWORK</h3>
+
+  <p>The artwork would consist of colored square sprites representing the player. The tiles will also be single colored. This will give the game a minimalistic look. The player would be able to easily focus on key components of the level.</p>
+
+  <p>Sprites needed:</p>
+  <ul>
+    <li>Player (3 different sizes, 3 different colors, walking, idle)</li>
+    <li>Button (pressed and not pressed)</li>
+    <li>Enemy (walking and idle)</li>
+  </ul>
+
+
+
+  <h3>SOUND EFFECTS</h3>
+
+  <p>There would be simple sound effects such as clicks to indicate the player’s interactions with the environment. Sound would be a major component in indicating to the player that they either successfully interacted with the environment or that they have made a mistake.</p>
+  <p> Events that will require a sound effect:</p>
+  <ul>
+    <li>Splitting </li>
+    <li>Merging </li>
+    <li>Pressing button </li>
+    <li>Changing color </li>
+    <li>Dying  </li>
+    <li>Completing Level </li>
+    <li>Platform breaking </li>
+    <li>Player landing on platform </li>
+    <li>Walking </li>
+    <li>Getting killed by enemy  </li>
+    <li>Killing enemy </li>
+   </ul>
+<br />
+
+  <h3>MUSIC</h3>
+
+  <p>To match the art style of the game, the music choice would have to be simple with a few tones. It would have a single layer of music and it would be electronic and at a slow/medium tempo to match the pacing of the game. The music would give a feeling of slow and planned out thoughts..</p>
+<br />
+
+
+
+<hr />
+
+<p><br /></p>
+</div>
+
+ </body>
 </html>
