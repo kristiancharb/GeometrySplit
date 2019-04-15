@@ -1,4 +1,5 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var GeometrySplit = GeometrySplit || {};
+
 var map;
 var backgroundLayer;
 var blockedLayer;
@@ -14,127 +15,140 @@ var originalSize;
 var lockedLeft;
 var lockedRight;
 
+//loading the game assets
+GeometrySplit.Game = function(){};
 
-function preload() {
-    console.log(game)
-    game.stage.backgroundColor = '#fff';
-    game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    game.scale.pageAlignHorizontally = true;
-    game.scale.pageAlignVertically = true;
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-    game.load.tilemap('map', '../assets/test.json', null, Phaser.Tilemap.TILED_JSON);
-    game.load.spritesheet('player', '../assets/square.png', 128, 128, 1);
-    game.load.spritesheet('door', '../assets/gradient.png', 64, 128, 1);
-    game.load.spritesheet('lever', '../assets/lever.png', 32, 32, 1);
-    game.load.spritesheet('spike', '../assets/spike.png',32,32,1);
-    game.load.image('tiles', '../assets/simples_copy.png');
-}
+GeometrySplit.Game.prototype = {
+    preload: function() {
+        this.stage.backgroundColor = '#fff';
+        this.scale.pageAlignHorizontally = true;
+        this.scale.pageAlignVertically = true;
+        this.physics.startSystem(Phaser.Physics.ARCADE);
+        this.load.tilemap('map', '../assets/test.json', null, Phaser.Tilemap.TILED_JSON);
+        this.load.spritesheet('player', '../assets/square.png', 128, 128, 1);
+        this.load.spritesheet('door', '../assets/gradient.png', 64, 128, 1);
+        this.load.spritesheet('lever', '../assets/lever.png', 32, 32, 1);
+        this.load.spritesheet('spike', '../assets/spike.png',32,32,1);
+        this.load.image('tiles', '../assets/simples_copy.png');
 
-function create() {
-    map = game.add.tilemap('map');
-    map.addTilesetImage('simples_copy', 'tiles');
-    backgroundlayer = map.createLayer('backgroundLayer');
-    backgroundlayer.resizeWorld();
-    blockedLayer = map.createLayer('blockedLayer');
-    moveableLayer = map.createLayer('moveableLayer');
-    moveableLayer.kill();
+        let menuKey = this.input.keyboard.addKey(Phaser.Keyboard.ESC);
+        menuKey.onDown.add(() => {
+            this.game.paused = false;
+            this.state.start('LevelSelect');
+        });
+
+        let pauseKey = this.input.keyboard.addKey(Phaser.Keyboard.P);
+        pauseKey.onDown.add(() => {
+            this.game.paused = !this.game.paused;
+        });
+    },
+    create: function() {
+        map = this.add.tilemap('map');
+        map.addTilesetImage('simples_copy', 'tiles');
+        backgroundlayer = map.createLayer('backgroundLayer');
+        backgroundlayer.resizeWorld();
+        blockedLayer = map.createLayer('blockedLayer');
+        moveableLayer = map.createLayer('moveableLayer');
+        moveableLayer.kill();
+        
+        map.setCollisionBetween(1, 5000, true, 'blockedLayer');
+        map.setCollisionBetween(1, 5000, true, 'moveableLayer');
     
-    map.setCollisionBetween(1, 5000, true, 'blockedLayer');
-    map.setCollisionBetween(1, 5000, true, 'moveableLayer');
+        var exitObj = findObjectsByType('exit', 'objectsLayer');
+        exit = this.add.sprite(exitObj[0].x, exitObj[0].y, 'door');
+        exit.enableBody = true;
+        var leverObj = findObjectsByType('lever', 'objectsLayer')
+        lever = this.add.sprite(leverObj[0].x + map.tileWidth / 2, leverObj[0].y + map.tileWidth / 2, 'lever');
+        lever.anchor.setTo(0.5, 0.5)
+    
+    
+        this.physics.arcade.gravity.y = 300;
+        //console.log(lever);
+        //console.log("SKIP");
+        players = this.add.group();
+        hazards = this.add.group();
+    
+    
+        // In the objects layer, the tilemap has a tile with the property playerStart
+        // denoting the spawn location
+        var player = findObjectsByType('playerStart', 'objectsLayer');
+        currentPlayer = this.add.sprite(player[0].x, player[0].y, 'player');
+        originalSize = currentPlayer.width;
+        playerSetUp(currentPlayer);
+        this.camera.follow(currentPlayer);
+        var spikes = findObjectsByType('spike', 'objectsLayer');
+        spikes.forEach(function(element){
+            var newSpike = GeometrySplit.game.add.sprite(element.x, element.y, 'spike');
+            //console.log(newSpike);
+            hazards.add(newSpike);
+        });
+    
+        lever.bringToTop();
+    
+        //set up controls
+        cursors = this.input.keyboard.createCursorKeys();
+        jumpButton = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        var splitButton = this.input.keyboard.addKey(Phaser.Keyboard.R);
+        splitButton.onDown.add(split);
+        var cycleLeftButton = this.input.keyboard.addKey(Phaser.Keyboard.Q);
+        cycleLeftButton.onDown.add(() => cyclePlayer(true))
+        var cycleRightButton = this.input.keyboard.addKey(Phaser.Keyboard.E);
+        cycleRightButton.onDown.add(() => cyclePlayer(false));
+        var interactButton = this.input.keyboard.addKey(Phaser.Keyboard.SHIFT)
+        interactButton.onDown.add(() => {
+            //console.log('Shift')
+            if(currentPlayer.overlap(lever)) {
+                lever.scale.x *= -1;
+                if(moveableLayer.alive) {
+                    moveableLayer.kill();
+                } else {
+                    moveableLayer.revive();
+                }
+            }
+        });
+    },
+    update: function() {
 
-    var exitObj = findObjectsByType('exit', 'objectsLayer');
-    exit = game.add.sprite(exitObj[0].x, exitObj[0].y, 'door');
-    exit.enableBody = true;
-    var leverObj = findObjectsByType('lever', 'objectsLayer')
-    lever = game.add.sprite(leverObj[0].x + map.tileWidth / 2, leverObj[0].y + map.tileWidth / 2, 'lever');
-    lever.anchor.setTo(0.5, 0.5)
-
-
-    game.physics.arcade.gravity.y = 300;
-    console.log(lever);
-    console.log("SKIP");
-    players = game.add.group();
-    hazards = game.add.group();
-
-
-    // In the objects layer, the tilemap has a tile with the property playerStart
-    // denoting the spawn location
-    var player = findObjectsByType('playerStart', 'objectsLayer');
-    currentPlayer = game.add.sprite(player[0].x, player[0].y, 'player');
-    originalSize = currentPlayer.width;
-    playerSetUp(currentPlayer);
-    game.camera.follow(currentPlayer);
-    var spikes = findObjectsByType('spike', 'objectsLayer');
-    spikes.forEach(function(element){
-    	var newSpike = game.add.sprite(element.x, element.y, 'spike');
-    	console.log(newSpike);
-    	hazards.add(newSpike);
-    });
-
-    lever.bringToTop();
-
-    //set up controls
-    cursors = game.input.keyboard.createCursorKeys();
-    jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-    var splitButton = game.input.keyboard.addKey(Phaser.Keyboard.R);
-    splitButton.onDown.add(split);
-    var cycleLeftButton = game.input.keyboard.addKey(Phaser.Keyboard.Q);
-    cycleLeftButton.onDown.add(() => cyclePlayer(true))
-    var cycleRightButton = game.input.keyboard.addKey(Phaser.Keyboard.E);
-    cycleRightButton.onDown.add(() => cyclePlayer(false));
-    var interactButton = game.input.keyboard.addKey(Phaser.Keyboard.SHIFT)
-    interactButton.onDown.add(() => {
-        console.log('Shift')
-        if(currentPlayer.overlap(lever)) {
-            lever.scale.x *= -1;
-            if(moveableLayer.alive) {
-                moveableLayer.kill();
-            } else {
-                moveableLayer.revive();
+        if(Math.floor(currentPlayer.body.width) === originalSize) {
+            checkLevelComplete();
+        }
+    
+        updateCollisions();
+        checkLocks();
+    
+        players.forEach((p) => p.body.velocity.x = 0);
+        if (cursors.left.isDown && !lockedLeft) {
+            currentPlayer.body.velocity.x = -500;
+            lockedRight = null;
+        } else if (cursors.right.isDown && !lockedRight) {
+            currentPlayer.body.velocity.x = 500;
+            lockedLeft = null;
+        }
+        if(currentPlayer.body.onFloor())
+        {
+            var tint = getTileColorUnderneath(currentPlayer.x + (currentPlayer.width / 2), currentPlayer.bottom);
+            if (tint != 0)
+            {
+                currentPlayer.tint = tint;
             }
         }
-    });
-}
-
-function update() {
-    if(Math.floor(currentPlayer.body.width) === originalSize) {
-        checkLevelComplete();
-    }
-
-    updateCollisions();
-    checkLocks();
-
-    players.forEach((p) => p.body.velocity.x = 0);
-    if (cursors.left.isDown && !lockedLeft) {
-        currentPlayer.body.velocity.x = -500;
-        lockedRight = null;
-    } else if (cursors.right.isDown && !lockedRight) {
-        currentPlayer.body.velocity.x = 500;
-        lockedLeft = null;
-    }
-    if(currentPlayer.body.onFloor())
-    {
-        var tint = getTileColorUnderneath(currentPlayer.x + (currentPlayer.width / 2), currentPlayer.bottom);
-        if (tint != 0)
-        {
-            currentPlayer.tint = tint;
+        if(this.input.activePointer.isDown) {
+            //(isXYCoordClear(this.input.activePointer.worldX, this.input.activePointer.worldY, currentPlayer.body.width))
+        }
+        
+        if(jumpButton.isDown && (currentPlayer.body.onFloor() ||
+           currentPlayer.body.touching.down)){
+            currentPlayer.body.velocity.y = -850;
         }
     }
-    if(game.input.activePointer.isDown) {
-        console.log(isXYCoordClear(game.input.activePointer.worldX, game.input.activePointer.worldY, currentPlayer.body.width))
-    }
-    
-    if(jumpButton.isDown && (currentPlayer.body.onFloor() ||
-       currentPlayer.body.touching.down)){
-        currentPlayer.body.velocity.y = -850;
-    }
-}
+};
 
 function checkLevelComplete() {
     if(currentPlayer.overlap(exit) && (currentPlayer.body.right - exit.x) > (exit.width / 2)) {
         console.log('LEVEL COMPLETE');
         //TEMP (go to next level)
         currentPlayer.kill();
+        GeometrySplit.game.state.start('LevelSelect');
     }
 }
 
@@ -154,7 +168,7 @@ function findObjectsByType(type, layer) {
 
 // Set up animations, physics, and group for a new player
 function playerSetUp(p) {
-    game.physics.arcade.enable(p);
+    GeometrySplit.game.physics.arcade.enable(p);
     //p.animations.add('walk');
     //p.animations.play('walk', 8, true);
     p.body.collideWorldBounds = true;
@@ -187,12 +201,12 @@ function split() {
     var scale = newWidth / originalSize;
     var newX = getNewPlayerXCoord(currentPlayer.body.bottom - newWidth, newWidth);
     if(newX && scale >= 0.5) {
-        var newPlayer = game.add.sprite(newX, currentPlayer.y, 'player');
+        var newPlayer = GeometrySplit.game.add.sprite(newX, currentPlayer.y, 'player');
         playerSetUp(newPlayer);
         newPlayer.scale.setTo(scale, scale);
         currentPlayer.scale.setTo(scale, scale);
     } else {
-        console.log('SPLIT FAILED')
+        //console.log('SPLIT FAILED')
     }
 }
 
@@ -207,7 +221,7 @@ function merge(p1, p2) {
         players.remove(p2);
         if(currentPlayer === p1 || currentPlayer === p2) {
             currentPlayer = p1;
-            game.camera.follow(p1);
+            GeometrySplit.game.camera.follow(p1);
         }
     } else if(currentPlayer === p1 || currentPlayer === p2) {
         setLocks(p1, p2);
@@ -226,7 +240,7 @@ function cyclePlayer(cycleForward) {
         if(player == currentPlayer) currentPlayer = players.previous();
         else currentPlayer = player;
     }
-    game.camera.follow(currentPlayer);
+    GeometrySplit.game.camera.follow(currentPlayer);
     lockedLeft = null;
     lockedRight = null;
 }
@@ -234,9 +248,9 @@ function cyclePlayer(cycleForward) {
 // update collisions between every player and the blocked (platforms)
 // layer and between every player and other player (merge if same size)
 function updateCollisions() {
-    game.physics.arcade.collide(players, blockedLayer);
-    game.physics.arcade.collide(players, moveableLayer);
-    game.physics.arcade.collide(players, players, (p1, p2) => {
+    GeometrySplit.game.physics.arcade.collide(players, blockedLayer);
+    GeometrySplit.game.physics.arcade.collide(players, moveableLayer);
+    GeometrySplit.game.physics.arcade.collide(players, players, (p1, p2) => {
         if(p1 === p2) {
             return;
         }
@@ -246,9 +260,9 @@ function updateCollisions() {
             setLocks(p1, p2);
         }
     });
-    console.log(game.physics.arcade.overlap(players, hazards));
+    //console.log(GeometrySplit.game.physics.arcade.overlap(players, hazards));
     // maybe remove this part once spawning is improved?
-    game.physics.arcade.overlap(players, players, (p1, p2) => {
+    GeometrySplit.game.physics.arcade.overlap(players, players, (p1, p2) => {
         if(p1 === p2 || !(p1.body.touching.right || p1.body.touching.left)) {
             return;
         }
