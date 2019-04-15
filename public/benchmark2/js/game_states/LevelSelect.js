@@ -8,7 +8,7 @@ GeometrySplit.LevelSelect.prototype = {
     },
     create: function () {
 
-      this.game.stage.backgroundColor = '#e8e8e8';
+      this.game.stage.backgroundColor = '#fff';
 
       buttonStart = GeometrySplit.game.add.text(30, 600-50, 'Back', {});
       buttonStart.inputEnabled = true;

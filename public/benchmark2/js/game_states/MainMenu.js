@@ -13,7 +13,7 @@ GeometrySplit.MainMenu.prototype = {
     },
     create: function () {
 
-      this.game.stage.backgroundColor = '#d3d3d3';
+      this.game.stage.backgroundColor = '#fff';
 
       buttonStart = GeometrySplit.game.add.text(30, 300, 'Start Game', {});
       buttonStart.inputEnabled = true;

@@ -6,7 +6,7 @@ GeometrySplit.Controls = function () { };
 GeometrySplit.Controls.prototype = {
     create: function () {
 
-        this.game.stage.backgroundColor = '#d3d3d3';
+        this.game.stage.backgroundColor = '#fff';
 
         buttonSettings = GeometrySplit.game.add.text(30, 600-50, 'Back', {});
         buttonSettings.inputEnabled = true;
