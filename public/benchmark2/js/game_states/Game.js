@@ -19,12 +19,8 @@ var lockedRight;
 GeometrySplit.Game = function(){};
 
 GeometrySplit.Game.prototype = {
-    shutdown: function() {
-        this.game.world.removeAll();
-    },
     preload: function() {
         this.stage.backgroundColor = '#fff';
-        this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         this.scale.pageAlignHorizontally = true;
         this.scale.pageAlignVertically = true;
         this.physics.startSystem(Phaser.Physics.ARCADE);

@@ -10,9 +10,14 @@ GeometrySplit.LevelSelect.prototype = {
 
       this.game.stage.backgroundColor = '#fff';
 
-      buttonStart = GeometrySplit.game.add.text(30, 600-50, 'Back', {});
-      buttonStart.inputEnabled = true;
-      buttonStart.events.onInputDown.add((e) => {
+      let menuKey = this.input.keyboard.addKey(Phaser.Keyboard.ESC);
+      menuKey.onDown.add(() => {
+        this.state.start('MainMenu')
+      });
+
+      buttonBack = GeometrySplit.game.add.text(30, 50, '← Back', {});
+      buttonBack.inputEnabled = true;
+      buttonBack.events.onInputDown.add((e) => {
         GeometrySplit.game.state.start('MainMenu');
       }, this);
 
