@@ -31,10 +31,15 @@ GeometrySplit.Game.prototype = {
         this.load.spritesheet('spike', '../assets/spike.png',32,32,1);
         this.load.image('tiles', '../assets/simples_copy.png');
 
-        var menuKey = this.input.keyboard.addKey(Phaser.Keyboard.ESC);
+        let menuKey = this.input.keyboard.addKey(Phaser.Keyboard.ESC);
         menuKey.onDown.add(() => {
-            this.game.world.removeAll();
-            this.state.start('LevelSelect')
+            this.game.paused = false;
+            this.state.start('LevelSelect');
+        });
+
+        let pauseKey = this.input.keyboard.addKey(Phaser.Keyboard.P);
+        pauseKey.onDown.add(() => {
+            this.game.paused = !this.game.paused;
         });
     },
     create: function() {
