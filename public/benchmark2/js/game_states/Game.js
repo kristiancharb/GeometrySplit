@@ -260,7 +260,20 @@ function updateCollisions() {
             setLocks(p1, p2);
         }
     });
-    //console.log(GeometrySplit.game.physics.arcade.overlap(players, hazards));
+    players.forEach(function (p){
+    	hazards.forEach(function (h){
+    		if (p.overlap(h))
+    		{
+    			if (p.right > h.left)
+    			{
+    				if(p.bottom  > h.top)
+    				{
+    					GeometrySplit.game.state.restart();
+    				}
+    			}
+    		}
+    	});
+    });
     // maybe remove this part once spawning is improved?
     GeometrySplit.game.physics.arcade.overlap(players, players, (p1, p2) => {
         if(p1 === p2 || !(p1.body.touching.right || p1.body.touching.left)) {
