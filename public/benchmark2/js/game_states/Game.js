@@ -26,9 +26,9 @@ GeometrySplit.Game.prototype = {
         this.scale.pageAlignVertically = true;
         this.physics.startSystem(Phaser.Physics.ARCADE);
         this.load.tilemap('map', 'assets/test.json', null, Phaser.Tilemap.TILED_JSON);
-        this.load.spritesheet('player', 'assets/square-sprite.png', 64, 64, 1);
+        this.load.spritesheet('player', 'assets/square-sprite.png', 64, 64, 3);
         this.load.spritesheet('door', 'assets/door-sprite.png', 32, 64, 1);
-        this.load.spritesheet('lever', 'assets/lever-sprite.png', 32, 32, 1);
+        this.load.spritesheet('lever', 'assets/lever-sprite.png', 32, 32);
         this.load.spritesheet('spike', 'assets/spike.png',32,32,1);
         this.load.image('tiles', 'assets/tileset.png');
 
@@ -82,6 +82,7 @@ GeometrySplit.Game.prototype = {
         currentPlayer = this.add.sprite(player[0].x, player[0].y, 'player');
         originalSize = currentPlayer.width;
         playerSetUp(currentPlayer);
+        currentPlayer.animations.play('current', 8, true);
         this.camera.follow(currentPlayer);
         var spikes = findObjectsByType('spike', 'objectsLayer');
         spikes.forEach(function(element){
@@ -185,8 +186,7 @@ function findObjectsByType(type, layer) {
 // Set up animations, physics, and group for a new player
 function playerSetUp(p) {
     GeometrySplit.game.physics.arcade.enable(p);
-    //p.animations.add('walk');
-    //p.animations.play('walk', 8, true);
+    p.animations.add('current', [0, 1, 2, 1], 8);
     p.body.collideWorldBounds = true;
     p.body.gravity.y = 1000;
     p.body.maxVelocity.y = 850;
@@ -239,6 +239,7 @@ function merge(p1, p2) {
         if(currentPlayer === p1 || currentPlayer === p2) {
             currentPlayer = p1;
             GeometrySplit.game.camera.follow(p1);
+            currentPlayer.animations.play('current', 8, true);
         }
     } else if(currentPlayer === p1 || currentPlayer === p2) {
         setLocks(p1, p2);
@@ -248,6 +249,7 @@ function merge(p1, p2) {
 // Make current player the next/prev player in group
 function cyclePlayer(cycleForward) {
     var player;
+    currentPlayer.animations.stop(null, true)
     if(cycleForward){
         player = players.next();
         if(player == currentPlayer) currentPlayer = players.next();
@@ -258,6 +260,7 @@ function cyclePlayer(cycleForward) {
         else currentPlayer = player;
     }
     GeometrySplit.game.camera.follow(currentPlayer);
+    currentPlayer.animations.play('current', 8, true);
     lockedLeft = null;
     lockedRight = null;
 }

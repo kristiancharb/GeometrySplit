@@ -18,10 +18,14 @@ GeometrySplit.Help.prototype = {
             GeometrySplit.game.state.start('MainMenu');
         }, this);
 
-        let lorem = 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.'
+        let lorem = 'You can split yourself into two pieces and switch control between these pieces. ' + 
+        'When you\'re ready to put your pieces back together just collide together from the side and your pieces will merge ' + 
+        'Use your splitting ability to an advantage! You\'ll soon realize that your split pieces can get to places that a '
+        'whole you can\'t. To finish a level, just make sure you put yourself back together and walk through the door.'
+        let backstory = 'You are Test Subject 117, the first successful experiment by Incorporated Inc. to inject consciousness into a geometric host. You realize the experiments lead to some nasty side-effects, such as giving you the ability to split up your body. Use this ability to escape this terrifying geometric world!'
 
-        let move = GeometrySplit.game.add.text(30, 150, 'Backstory:', {});
-        let jump = GeometrySplit.game.add.text(30, 200, lorem, { fontSize: '2em', wordWrap: true, wordWrapWidth: 600 });
+        let move = GeometrySplit.game.add.text(30, 125, backstory, {fontSize: '2em', wordWrap: true, wordWrapWidth: 700 });
+        let jump = GeometrySplit.game.add.text(30, 300, lorem, { fontSize: '2em', wordWrap: true, wordWrapWidth: 700 });
         let split = GeometrySplit.game.add.text(30, 500, 'Created By:', {});
         let swap = GeometrySplit.game.add.text(30, 550, 'Hong Jie Cen, Kristian Charbonneau, Henry Long', { fontSize: '2em' });
     },

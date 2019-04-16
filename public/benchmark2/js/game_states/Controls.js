@@ -19,7 +19,7 @@ GeometrySplit.Controls.prototype = {
             GeometrySplit.game.state.start('MainMenu');
         }, this);
 
-        GeometrySplit.game.add.text(30, 300-100, 'Move: A & D', {});
+        GeometrySplit.game.add.text(30, 300-100, 'Move: Arrow Keys', {});
         GeometrySplit.game.add.text(30, 300-50, 'Jump: Space', {});
         GeometrySplit.game.add.text(30, 300+0, 'Split: R', {});
         GeometrySplit.game.add.text(30, 300+50, 'Swap: Q & E', {});
