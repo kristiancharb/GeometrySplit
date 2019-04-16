@@ -3,7 +3,8 @@ var GeometrySplit = GeometrySplit || {};
 var map;
 var backgroundLayer;
 var blockedLayer;
-var moveableLayer;
+var moveableLayer1;
+var moveableLayer2;
 var currentPlayer;
 var exit;
 var lever;
@@ -25,11 +26,11 @@ GeometrySplit.Game.prototype = {
         this.scale.pageAlignVertically = true;
         this.physics.startSystem(Phaser.Physics.ARCADE);
         this.load.tilemap('map', '../assets/test.json', null, Phaser.Tilemap.TILED_JSON);
-        this.load.spritesheet('player', '../assets/square.png', 128, 128, 1);
-        this.load.spritesheet('door', '../assets/gradient.png', 64, 128, 1);
-        this.load.spritesheet('lever', '../assets/lever.png', 32, 32, 1);
+        this.load.spritesheet('player', '../assets/square-sprite.png', 64, 64, 1);
+        this.load.spritesheet('door', '../assets/door-sprite.png', 32, 64, 1);
+        this.load.spritesheet('lever', '../assets/lever-sprite.png', 32, 32, 1);
         this.load.spritesheet('spike', '../assets/spike.png',32,32,1);
-        this.load.image('tiles', '../assets/simples_copy.png');
+        this.load.image('tiles', '../assets/tileset.png');
 
         let menuKey = this.input.keyboard.addKey(Phaser.Keyboard.ESC);
         menuKey.onDown.add(() => {
@@ -44,25 +45,31 @@ GeometrySplit.Game.prototype = {
     },
     create: function() {
         map = this.add.tilemap('map');
-        map.addTilesetImage('simples_copy', 'tiles');
+        map.addTilesetImage('tileset', 'tiles');
         backgroundlayer = map.createLayer('backgroundLayer');
         backgroundlayer.resizeWorld();
         blockedLayer = map.createLayer('blockedLayer');
-        moveableLayer = map.createLayer('moveableLayer');
-        moveableLayer.kill();
+        moveableLayer1 = map.createLayer('moveableLayer1');
+        moveableLayer1.kill();
+        moveableLayer2 = map.createLayer('moveableLayer2');
+        moveableLayer2.kill();
         
         map.setCollisionBetween(1, 5000, true, 'blockedLayer');
-        map.setCollisionBetween(1, 5000, true, 'moveableLayer');
+        map.setCollisionBetween(1, 5000, true, 'moveableLayer1');
+        map.setCollisionBetween(1, 5000, true, 'moveableLayer2');
     
         var exitObj = findObjectsByType('exit', 'objectsLayer');
         exit = this.add.sprite(exitObj[0].x, exitObj[0].y, 'door');
         exit.enableBody = true;
-        var leverObj = findObjectsByType('lever', 'objectsLayer')
-        lever = this.add.sprite(leverObj[0].x + map.tileWidth / 2, leverObj[0].y + map.tileWidth / 2, 'lever');
-        lever.anchor.setTo(0.5, 0.5)
+        var leverObj1 = findObjectsByType('lever1', 'objectsLayer')
+        lever1 = this.add.sprite(leverObj1[0].x + map.tileWidth / 2, leverObj1[0].y + map.tileWidth / 2, 'lever');
+        lever1.anchor.setTo(0.5, 0.5)
+        var leverObj2 = findObjectsByType('lever2', 'objectsLayer')
+        lever2 = this.add.sprite(leverObj2[0].x + map.tileWidth / 2, leverObj2[0].y + map.tileWidth / 2, 'lever');
+        lever2.anchor.setTo(0.5, 0.5)
     
     
-        this.physics.arcade.gravity.y = 300;
+        this.physics.arcade.gravity.y = 1000;
         //console.log(lever);
         //console.log("SKIP");
         players = this.add.group();
@@ -83,7 +90,8 @@ GeometrySplit.Game.prototype = {
             hazards.add(newSpike);
         });
     
-        lever.bringToTop();
+        lever1.bringToTop();
+        lever2.bringToTop();
     
         //set up controls
         cursors = this.input.keyboard.createCursorKeys();
@@ -97,12 +105,20 @@ GeometrySplit.Game.prototype = {
         var interactButton = this.input.keyboard.addKey(Phaser.Keyboard.SHIFT)
         interactButton.onDown.add(() => {
             //console.log('Shift')
-            if(currentPlayer.overlap(lever)) {
-                lever.scale.x *= -1;
-                if(moveableLayer.alive) {
-                    moveableLayer.kill();
+            if(currentPlayer.overlap(lever1)) {
+                lever1.scale.x *= -1;
+                if(moveableLayer1.alive) {
+                    moveableLayer1.kill();
                 } else {
-                    moveableLayer.revive();
+                    moveableLayer1.revive();
+                }
+            }
+            if(currentPlayer.overlap(lever2)) {
+                lever2.scale.x *= -1;
+                if(moveableLayer2.alive) {
+                    moveableLayer2.kill();
+                } else {
+                    moveableLayer2.revive();
                 }
             }
         });
@@ -138,7 +154,7 @@ GeometrySplit.Game.prototype = {
         
         if(jumpButton.isDown && (currentPlayer.body.onFloor() ||
            currentPlayer.body.touching.down)){
-            currentPlayer.body.velocity.y = -850;
+            currentPlayer.body.velocity.y = -700;
         }
     }
 };
@@ -175,6 +191,7 @@ function playerSetUp(p) {
     p.body.gravity.y = 1000;
     p.body.maxVelocity.y = 850;
     p.body.bounce = {x: 0, y: 0};
+    p.tint = 0x98FB98;
     players.add(p);
 }
 
@@ -249,7 +266,8 @@ function cyclePlayer(cycleForward) {
 // layer and between every player and other player (merge if same size)
 function updateCollisions() {
     GeometrySplit.game.physics.arcade.collide(players, blockedLayer);
-    GeometrySplit.game.physics.arcade.collide(players, moveableLayer);
+    GeometrySplit.game.physics.arcade.collide(players, moveableLayer1);
+    GeometrySplit.game.physics.arcade.collide(players, moveableLayer2);
     GeometrySplit.game.physics.arcade.collide(players, players, (p1, p2) => {
         if(p1 === p2) {
             return;
