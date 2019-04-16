@@ -25,12 +25,12 @@ GeometrySplit.Game.prototype = {
         this.scale.pageAlignHorizontally = true;
         this.scale.pageAlignVertically = true;
         this.physics.startSystem(Phaser.Physics.ARCADE);
-        this.load.tilemap('map', '../assets/test.json', null, Phaser.Tilemap.TILED_JSON);
-        this.load.spritesheet('player', '../assets/square-sprite.png', 64, 64, 1);
-        this.load.spritesheet('door', '../assets/door-sprite.png', 32, 64, 1);
-        this.load.spritesheet('lever', '../assets/lever-sprite.png', 32, 32, 1);
-        this.load.spritesheet('spike', '../assets/spike.png',32,32,1);
-        this.load.image('tiles', '../assets/tileset.png');
+        this.load.tilemap('map', 'assets/test.json', null, Phaser.Tilemap.TILED_JSON);
+        this.load.spritesheet('player', 'assets/square-sprite.png', 64, 64, 1);
+        this.load.spritesheet('door', 'assets/door-sprite.png', 32, 64, 1);
+        this.load.spritesheet('lever', 'assets/lever-sprite.png', 32, 32, 1);
+        this.load.spritesheet('spike', 'assets/spike.png',32,32,1);
+        this.load.image('tiles', 'assets/tileset.png');
 
         let menuKey = this.input.keyboard.addKey(Phaser.Keyboard.ESC);
         menuKey.onDown.add(() => {
@@ -272,7 +272,7 @@ function updateCollisions() {
         if(p1 === p2) {
             return;
         }
-        if(Math.abs(p1.width - p2.width) < 1){
+        if(Math.abs(p1.width - p2.width) < 1 && Math.abs(p1.y - p2.y) < 1){
             merge(p1, p2);
         } else if(currentPlayer === p1 || currentPlayer === p2) {
             setLocks(p1, p2);
