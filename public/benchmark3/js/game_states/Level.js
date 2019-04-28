@@ -236,7 +236,7 @@ class Level {
                 this.currentPlayer.animations.play('current', 8, true);
             }
         } else if(this.currentPlayer === p1 || this.currentPlayer === p2) {
-            //this.setLocks(p1, p2);
+            this.setLocks(p1, p2);
         }
     }
     
