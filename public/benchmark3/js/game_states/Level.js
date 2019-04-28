@@ -5,6 +5,7 @@ class Level {
         this.backgroundLayer;
         this.blockedLayer;
         this.moveableLayers = {};
+        this.filterLayers = Array();
         this.currentPlayer;
         this.exit;
         this.levers = Array();
@@ -58,11 +59,18 @@ class Level {
         this.backgroundlayer = this.map.createLayer('backgroundLayer');
         this.backgroundlayer.resizeWorld();
         this.blockedLayer = this.map.createLayer('blockedLayer');
+        this.map.setCollisionBetween(1, 5000, true, 'blockedLayer');
         this.map.layers.forEach((layer) => {
             if(layer.properties[1] && layer.properties[1].value === 'moveableLayer') {
                 var l = this.map.createLayer(layer.name);
                 this.moveableLayers[layer.properties[0].value] = l;
                 l.kill();
+                this.map.setCollisionBetween(1, 5000, true, layer.name);
+            } else if(layer.properties[1] && layer.properties[1].value === 'filterLayer') {
+                var l = this.map.createLayer(layer.name);
+                l.filterColor = parseInt(layer.properties[0].value, 16);
+                l.alpha = 0.5;
+                this.filterLayers.push(l);
                 this.map.setCollisionBetween(1, 5000, true, layer.name);
             }
         });
@@ -76,9 +84,9 @@ class Level {
         this.exit.enableBody = true;
 
         this.game.physics.arcade.gravity.y = 1000;
-        //console.log(lever);
-        //console.log("SKIP");
+
         this.players = this.game.add.group();
+        this.enemies = this.game.add.group();
         this.hazards = this.game.add.group();
         this.enemies = this.game.add.group();
         this.buttons = this.game.add.group();
@@ -108,11 +116,25 @@ class Level {
         var leverObjs = this.findObjectsByType('lever', 'objectsLayer')
         leverObjs.forEach((leverObj) => {
             var lever = this.game.add.sprite(leverObj.x + this.map.tileWidth / 2, leverObj.y + this.map.tileWidth / 2, 'lever');
-            this.levers.push(lever)
-            lever.moveableLayer = this.moveableLayers[leverObj.properties[0].value]
-            lever.anchor.setTo(0.5, 0.5)
-            lever.bringToTop()
-        })
+            this.levers.push(lever);
+            lever.moveableLayer = this.moveableLayers[leverObj.properties[0].value];
+            lever.anchor.setTo(0.5, 0.5);
+            lever.bringToTop();
+        });
+
+        var enemyObjs = this.findObjectsByType('enemy', 'objectsLayer');
+        enemyObjs.forEach((enemyObj) => {
+            var enemy = this.game.add.sprite(enemyObj.x, enemyObj.y, 'player');
+            this.game.physics.arcade.enable(enemy);
+            enemy.tint = 0x440000;
+            enemy.animations.add('current', [0, 1, 2, 1], 8);
+            enemy.animations.play('current', 8, true);
+            enemy.body.collideWorldBounds = true;
+            enemy.body.gravity.y = 1000;
+            enemy.direction = Math.random() > 0.5 ? -1 : 1;
+            this.enemies.add(enemy);
+        });
+
     
         //set up controls
         this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -198,6 +220,17 @@ class Level {
         this.checkLocks();
     
         this.players.forEach((p) => p.body.velocity.x = 0);
+        this.enemies.forEach((enemy) => {
+            var x = enemy.direction > 0 ?
+                    enemy.right + this.map.tileWidth * 0.1 :
+                    enemy.x - this.map.tileWidth * 0.1;
+            var y = enemy.bottom + this.map.tileHeight * 0.5;
+            if(!this.map.getTileWorldXY(x, y, 32, 32, this.blockedLayer)) {
+                enemy.direction *= -1;
+            } 
+            enemy.body.velocity.x = 200 * enemy.direction; 
+        });
+
         if (this.cursors.left.isDown && !this.lockedLeft) {
             this.currentPlayer.body.velocity.x = -500;
             this.lockedRight = null;
@@ -205,17 +238,15 @@ class Level {
             this.currentPlayer.body.velocity.x = 500;
             this.lockedLeft = null;
         }
-        if(this.currentPlayer.body.onFloor())
-        {
+        if(this.currentPlayer.body.onFloor()) {
             var tint = this.getTileColorUnderneath(this.currentPlayer.x + (this.currentPlayer.width / 2), this.currentPlayer.bottom);
-            if (tint != 0)
-            {
+            if (tint != 0) {
                 this.currentPlayer.tint = tint;
             }
         }
-        if(this.game.input.activePointer.isDown) {
-            //(isXYCoordClear(this.input.activePointer.worldX, this.input.activePointer.worldY, currentPlayer.body.width))
-        }
+        // if(this.game.input.activePointer.isDown) {
+        //     console.log(this.map.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, 32, 32));
+        // }
         
         if(this.jumpButton.isDown && (this.currentPlayer.body.onFloor() ||
            this.currentPlayer.body.touching.down)){
@@ -287,22 +318,21 @@ class Level {
         p.body.gravity.y = 1000;
         p.body.maxVelocity.y = 850;
         p.body.bounce = {x: 0, y: 0};
-        p.tint = 0x98FB98;
+        p.tint = 0xA4DB77;
         this.players.add(p);
     }
     
-    getTileColorUnderneath (x, y)
-    {
+    getTileColorUnderneath (x, y) {
         var tile;
-        if((tile = this.map.getTileWorldXY(x, y + 16, 32, 32, this.blockedLayer)) != null)
-        {
-            if(tile.index == 258)
-                return 0xFF0000;
-            if(tile.index == 259)
-                return 0x00FF00; 
-            if(tile.index == 451)
-                return 0xFFFFFF;
-            return 0;
+        if((tile = this.map.getTileWorldXY(x, y + 16, 32, 32, this.blockedLayer)) != null) {
+            if(tile.index == 1)
+                return 0xA4DB77;
+            if(tile.index == 4)
+                return 0xD15555;
+            if(tile.index == 5)
+                return 0x467AD6;
+            if(tile.index == 8)
+                return 0xED8A47;
         }
         return 0;
     }
@@ -317,6 +347,7 @@ class Level {
             var newPlayer = this.game.add.sprite(newX, this.currentPlayer.y, 'player');
             this.playerSetUp(newPlayer);
             newPlayer.scale.setTo(scale, scale);
+            newPlayer.tint = this.currentPlayer.tint;
             this.currentPlayer.scale.setTo(scale, scale);
         } else {
             console.log('SPLIT FAILED')
@@ -368,29 +399,29 @@ class Level {
     updateCollisions() {
         if (this.walkThroughWalls == 0)
             this.game.physics.arcade.collide(this.players, this.blockedLayer);
-        this.game.physics.arcade.collide(this.enemies, this.blockedLayer, (e1, b1) => {
-            console.log("COLLISIONS");
-            e1.body.velocity.x = e1.body.velocity.x * -1;
-        },
-        (e1, b1) => {
-            if (Math.floor((e1.x - 16) / 32) + 1 == b1.x && e1.body.velocity.x > 0)
-                return true;
-            if (Math.floor((e1.x - 16) / 32) - 1 == b1.x && e1.body.velocity.x < 0)
-                return true;
-            return false;
+        this.game.physics.arcade.collide(this.enemies, this.blockedLayer, (enemy, _) => {
+            if(enemy.body.blocked.right) {
+                enemy.direction = -1;
+            } else if(enemy.body.blocked.left) {
+                enemy.direction = 1;
+            }
         });
-        this.game.physics.arcade.collide(this.enemies, this.players, (p1, p2) => {
-            this.game.state.restart();
-        });
+        this.game.physics.arcade.collide(this.players, this.enemies, () => this.game.state.restart());
         Object.keys(this.moveableLayers).forEach((key) => {
             var layer = this.moveableLayers[key]
             this.game.physics.arcade.collide(this.players, layer);
+        })
+        this.filterLayers.forEach((layer) => {
+            if(this.currentPlayer.tint != layer.filterColor) {
+                this.game.physics.arcade.collide(this.players, layer);
+            }
         })
         this.game.physics.arcade.collide(this.players, this.players, (p1, p2) => {
             if(p1 === p2) {
                 return;
             }
-            if(Math.abs(p1.width - p2.width) < 1 && Math.abs(p1.y - p2.y) < 1){
+            if(Math.abs(p1.width - p2.width) < 1 && Math.abs(p1.y - p2.y) < 1 &&
+               p1.tint == p2.tint) {
                 this.merge(p1, p2);
             } else if(this.currentPlayer === p1 || this.currentPlayer === p2) {
                 this.setLocks(p1, p2);

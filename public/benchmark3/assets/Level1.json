@@ -327,6 +327,24 @@
                  "width":32,
                  "x":2560,
                  "y":640
+                }, 
+                {
+                 "gid":7,
+                 "height":32,
+                 "id":20,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"button"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":640,
+                 "y":320
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -381,7 +399,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":20,
+ "nextobjectid":21,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.2.3",
