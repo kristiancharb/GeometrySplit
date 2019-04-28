@@ -193,7 +193,12 @@ class Level {
             this.secretBuffer += 5;
             this.secretBuffer %= 10000000000;
             if(this.secretBuffer == 5555555555)
+            {
                 this.game.physics.arcade.gravity.y = 1000;
+                this.players.forEach((p) => {
+                    p.body.gravity.y = 1000;
+                });
+            }
             console.log(this.secretBuffer);
             });
         akey.onDown.add(() => {
@@ -205,7 +210,12 @@ class Level {
             else if(this.secretBuffer % 10000 == 6556)
                 this.walkThroughWalls = this.walkThroughWalls ^ 1;
             else if(this.secretBuffer == 6666666666)
+            {
                 this.game.physics.arcade.gravity.y = 0;
+                this.players.forEach((p) => {
+                    p.body.gravity.y = 0;
+                });
+            }
             console.log(this.secretBuffer);
             });
     }
@@ -444,22 +454,21 @@ class Level {
                 });
             });
         }
+        this.buttons.forEach((b) => {
+            b.animations.play('off');
+        });
         this.players.forEach((p) => {
             this.buttons.forEach((b) => {
                 if (p.overlap(b))
                 {
                     if (p.right > b.left)
                     {
-                        if(p.bottom  > b.top)
+                        if(p.bottom >= b.top)
                         {
+                            alert();
                             b.animations.play('on');
-                            console.log("HI");
                         }
                     }
-                }
-                else
-                {
-                    b.animations.play('off');
                 }
             });
         });
