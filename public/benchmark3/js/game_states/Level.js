@@ -24,6 +24,9 @@ class Level {
         this.i;
         this.walkThroughWalls;
         this.noGravity;
+        this.upButton;
+        this.downButton;
+        this.invinc;
     }
 
     preload(levelPath) {
@@ -77,6 +80,8 @@ class Level {
         this.colors = Phaser.Color.HSVColorWheel();
         this.i = 0;
         this.walkThroughWalls = 0;
+        this.noGravity = 0;
+        this.invinc = 0;
         this.map.setCollisionBetween(1, 5000, true, 'blockedLayer');
         this.secretBuffer = 0;
         var exitObj = this.findObjectsByType('exit', 'objectsLayer');
@@ -158,19 +163,20 @@ class Level {
                 }
             })
         });
-        var upkey = this.game.input.keyboard.addKey(Phaser.Keyboard.UP);
-        var downkey = this.game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+        this.upButton = this.game.input.keyboard.addKey(Phaser.Keyboard.UP);
+        this.downButton = this.game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
         var leftkey = this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
         var rightkey = this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
         var bkey =this.game.input.keyboard.addKey(Phaser.Keyboard.B);
         var akey =this.game.input.keyboard.addKey(Phaser.Keyboard.A);
-        upkey.onDown.add(() => {
+        var ikey = this.game.input.keyboard.addKey(Phaser.Keyboard.I);
+        this.upButton.onDown.add(() => {
             this.secretBuffer *= 10;
             this.secretBuffer += 1;
             this.secretBuffer %= 10000000000;
             console.log(this.secretBuffer);
             });
-        downkey.onDown.add(() => {
+        this.downButton.onDown.add(() => {
             this.secretBuffer *= 10;
             this.secretBuffer += 2;
             this.secretBuffer %= 10000000000;
@@ -194,6 +200,7 @@ class Level {
             this.secretBuffer %= 10000000000;
             if(this.secretBuffer == 5555555555)
             {
+                this.noGravity = 0;
                 this.game.physics.arcade.gravity.y = 1000;
                 this.players.forEach((p) => {
                     p.body.gravity.y = 1000;
@@ -211,6 +218,7 @@ class Level {
                 this.walkThroughWalls = this.walkThroughWalls ^ 1;
             else if(this.secretBuffer == 6666666666)
             {
+                this.noGravity = 1;
                 this.game.physics.arcade.gravity.y = 0;
                 this.players.forEach((p) => {
                     p.body.gravity.y = 0;
@@ -218,6 +226,9 @@ class Level {
             }
             console.log(this.secretBuffer);
             });
+        ikey.onDown.add(() => {
+            this.invinc = this.invinc ^ 1;
+        })
     }
 
     update() {
@@ -257,7 +268,15 @@ class Level {
         // if(this.game.input.activePointer.isDown) {
         //     console.log(this.map.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, 32, 32));
         // }
-        
+        if(this.upButton.isDown && this.noGravity == 1 && this.currentPlayer.y > 0)
+        {
+            this.currentPlayer.y -= 5;
+        }
+        if(this.downButton.isDown && this.noGravity == 1)
+        {
+            this.currentPlayer.y += 5;
+        }
+
         if(this.jumpButton.isDown && (this.currentPlayer.body.onFloor() ||
            this.currentPlayer.body.touching.down)){
             this.currentPlayer.body.velocity.y = -700;
@@ -437,7 +456,7 @@ class Level {
                 this.setLocks(p1, p2);
             }
         });
-        if (this.walkThroughWalls == 0)
+        if(this.invinc == 0)
         {
             this.players.forEach((p) => {
                 this.hazards.forEach((h) => {
@@ -465,7 +484,6 @@ class Level {
                     {
                         if(p.bottom >= b.top)
                         {
-                            alert();
                             b.animations.play('on');
                         }
                     }
