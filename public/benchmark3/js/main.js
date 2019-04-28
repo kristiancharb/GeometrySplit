@@ -1,6 +1,6 @@
 var GeometrySplit = GeometrySplit || {};
 
-GeometrySplit.game = new Phaser.Game(800, 600, Phaser.CANVAS, '');
+GeometrySplit.game = new Phaser.Game(800, 600, Phaser.AUTO, '');
 
 GeometrySplit.game.state.add('Load', GeometrySplit.Load);
 GeometrySplit.game.state.add('MainMenu', GeometrySplit.MainMenu);
