@@ -48,7 +48,8 @@ GeometrySplit.LevelSelect.prototype = {
       buttonStart4.inputEnabled = true;
       buttonStart4.addColor('#d3d3d3', 0);
       buttonStart4.events.onInputDown.add((e) => {
-        //GeometrySplit.game.state.start('Game');
+        GeometrySplit.levelNum = 4;
+        GeometrySplit.game.state.start('Game');
       }, this);
 
   },

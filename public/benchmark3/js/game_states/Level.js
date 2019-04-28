@@ -12,6 +12,7 @@ class Level {
         this.cursors;
         this.jumpButton;
         this.players;
+        this.enemies;
         this.hazards;
         this.originalSize;
         this.lockedLeft;
@@ -74,6 +75,7 @@ class Level {
         this.game.physics.arcade.gravity.y = 1000;
 
         this.players = this.game.add.group();
+        this.enemies = this.game.add.group();
         this.hazards = this.game.add.group();
     
     
@@ -91,14 +93,29 @@ class Level {
             //console.log(newSpike);
             this.hazards.add(newSpike);
         });
-        var leverObjs = this.findObjectsByType('lever', 'objectsLayer')
+
+        var leverObjs = this.findObjectsByType('lever', 'objectsLayer');
         leverObjs.forEach((leverObj) => {
             var lever = this.game.add.sprite(leverObj.x + this.map.tileWidth / 2, leverObj.y + this.map.tileWidth / 2, 'lever');
             this.levers.push(lever);
             lever.moveableLayer = this.moveableLayers[leverObj.properties[0].value];
             lever.anchor.setTo(0.5, 0.5);
             lever.bringToTop();
-        })
+        });
+
+        var enemyObjs = this.findObjectsByType('enemy', 'objectsLayer');
+        enemyObjs.forEach((enemyObj) => {
+            var enemy = this.game.add.sprite(enemyObj.x, enemyObj.y, 'player');
+            this.game.physics.arcade.enable(enemy);
+            enemy.tint = 0x440000;
+            enemy.animations.add('current', [0, 1, 2, 1], 8);
+            enemy.animations.play('current', 8, true);
+            enemy.body.collideWorldBounds = true;
+            enemy.body.gravity.y = 1000;
+            enemy.direction = Math.random() > 0.5 ? -1 : 1;
+            this.enemies.add(enemy);
+        });
+
     
         //set up controls
         this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -133,6 +150,17 @@ class Level {
         this.checkLocks();
     
         this.players.forEach((p) => p.body.velocity.x = 0);
+        this.enemies.forEach((enemy) => {
+            var x = enemy.direction > 0 ?
+                    enemy.right + this.map.tileWidth * 0.1 :
+                    enemy.x - this.map.tileWidth * 0.1;
+            var y = enemy.bottom + this.map.tileHeight * 0.5;
+            if(!this.map.getTileWorldXY(x, y, 32, 32, this.blockedLayer)) {
+                enemy.direction *= -1;
+            } 
+            enemy.body.velocity.x = 200 * enemy.direction; 
+        });
+
         if (this.cursors.left.isDown && !this.lockedLeft) {
             this.currentPlayer.body.velocity.x = -500;
             this.lockedRight = null;
@@ -146,9 +174,9 @@ class Level {
                 this.currentPlayer.tint = tint;
             }
         }
-        if(this.game.input.activePointer.isDown) {
-            console.log(this.map.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, 32, 32));
-        }
+        // if(this.game.input.activePointer.isDown) {
+        //     console.log(this.map.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, 32, 32));
+        // }
         
         if(this.jumpButton.isDown && (this.currentPlayer.body.onFloor() ||
            this.currentPlayer.body.touching.down)){
@@ -265,6 +293,14 @@ class Level {
     // layer and between every player and other player (merge if same size)
     updateCollisions() {
         this.game.physics.arcade.collide(this.players, this.blockedLayer);
+        this.game.physics.arcade.collide(this.enemies, this.blockedLayer, (enemy, _) => {
+            if(enemy.body.blocked.right) {
+                enemy.direction = -1;
+            } else if(enemy.body.blocked.left) {
+                enemy.direction = 1;
+            }
+        });
+        this.game.physics.arcade.collide(this.players, this.enemies, () => this.game.state.restart());
         Object.keys(this.moveableLayers).forEach((key) => {
             var layer = this.moveableLayers[key]
             this.game.physics.arcade.collide(this.players, layer);
