@@ -29,6 +29,13 @@ class Level {
         this.upButton;
         this.downButton;
         this.invinc;
+        this.audio_files = {
+            'jump': 'gs_jump.wav',
+            'land': 'gs_land.wav',
+            'lever': 'gs_lever.wav',
+            'split': 'gs_split.wav',
+            'loop': 'Retro Comedy.ogg',
+        };
     }
 
     preload(levelPath) {
@@ -46,19 +53,18 @@ class Level {
         this.game.load.spritesheet('button', 'assets/button.png', 32, 16,2);
         this.game.load.image('tiles', 'assets/tileset.png');
 
-        this.game.load.audio('jump', 'assets/audio/gs_jump.wav');
-        this.game.load.audio('land', 'assets/audio/gs_land.wav');
-        this.game.load.audio('lever', 'assets/audio/gs_lever.wav');
-        this.game.load.audio('split', 'assets/audio/gs_split.wav');
-
-        this.game.add.audio('jump');
-        this.game.add.audio('land');
-        this.game.add.audio('lever');
-        this.game.add.audio('split');
+        //this.game.load.audio('jump', 'assets/audio/gs_jump.wav');
+        for (var file in this.audio_files){
+            console.log(file+', '+'assets/audio/' + this.audio_files[file]);
+            this.game.load.audio(file, 'assets/audio/' + this.audio_files[file]);
+            this.game.add.audio(file);
+        }
+        
 
         let menuKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
         menuKey.onDown.add(() => {
             this.game.paused = false;
+            this.game.sound.stopAll();
             this.game.state.start('MainMenu');
         });
 
@@ -69,6 +75,9 @@ class Level {
     }
 
     create() {
+        this.game.sound.stopAll();
+        this.game.sound.play('loop', 0.75, true);
+
         this.map = this.game.add.tilemap('map');
         this.map.addTilesetImage('tileset', 'tiles');
         this.backgroundlayer = this.map.createLayer('backgroundLayer');
@@ -482,6 +491,7 @@ class Level {
                             if(p.bottom  > h.top)
                             {
                                 this.game.sound.play('land');
+                                this.game.sound.stopAll();
                                 this.game.state.restart();
                             }
                         }
