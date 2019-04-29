@@ -1,4 +1,10 @@
+
+//var effectLand;
+//var effectLever;
+//var effectSplit;
+
 class Level {
+    
     constructor(game) {
         this.game = game;
         this.map;
@@ -27,6 +33,7 @@ class Level {
         this.upButton;
         this.downButton;
         this.invinc;
+        this.effectJump;
     }
 
     preload(levelPath) {
@@ -43,6 +50,16 @@ class Level {
         this.game.load.spritesheet('spike', 'assets/spike.png',32,32,1);
         this.game.load.spritesheet('button', 'assets/button.png', 32, 16,2);
         this.game.load.image('tiles', 'assets/tileset.png');
+
+        this.game.load.audio('jump', 'assets/audio/gs_jump.wav');
+        this.game.load.audio('land', 'assets/audio/gs_land.wav');
+        this.game.load.audio('lever', 'assets/audio/gs_lever.wav');
+        this.game.load.audio('split', 'assets/audio/gs_split.wav');
+
+        this.effectJump = this.game.add.audio('jump');
+        //effectLand = this.game.add.audio('land');
+        //effectLever = this.game.add.audio('lever');
+        //effectSplit = this.game.add.audio('split');
 
         let menuKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
         menuKey.onDown.add(() => {
@@ -154,6 +171,7 @@ class Level {
         interactButton.onDown.add(() => {
             this.levers.forEach((lever) => {
                 if(this.currentPlayer.overlap(lever)) {
+                    //effectLever.play();
                     lever.scale.x *= -1;
                     if(lever.moveableLayer.alive) {
                         lever.moveableLayer.kill();
@@ -278,8 +296,10 @@ class Level {
         }
 
         if(this.jumpButton.isDown && (this.currentPlayer.body.onFloor() ||
-           this.currentPlayer.body.touching.down)){
-            this.currentPlayer.body.velocity.y = -700;
+            this.currentPlayer.body.touching.down)){
+                console.log(this.effectJump);
+                this.effectJump.play(0.75);
+                this.currentPlayer.body.velocity.y = -700;
         }
     }
 
@@ -373,6 +393,7 @@ class Level {
         var scale = newWidth / this.originalSize;
         var newX = this.getNewPlayerXCoord(this.currentPlayer.body.bottom - newWidth, newWidth);
         if(newX && scale >= 0.5) {
+            //effectSplit.play();
             var newPlayer = this.game.add.sprite(newX, this.currentPlayer.y, 'player');
             this.playerSetUp(newPlayer);
             newPlayer.scale.setTo(scale, scale);
@@ -466,6 +487,7 @@ class Level {
                         {
                             if(p.bottom  > h.top)
                             {
+                                //effectLand.play();
                                 this.game.state.restart();
                             }
                         }
