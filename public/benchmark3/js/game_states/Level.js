@@ -55,7 +55,7 @@ class Level {
 
         //this.game.load.audio('jump', 'assets/audio/gs_jump.wav');
         for (var file in this.audio_files){
-            console.log(file+', '+'assets/audio/' + this.audio_files[file]);
+            //console.log(file+', '+'assets/audio/' + this.audio_files[file]);
             this.game.load.audio(file, 'assets/audio/' + this.audio_files[file]);
             this.game.add.audio(file);
         }
