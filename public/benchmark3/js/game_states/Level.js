@@ -115,8 +115,10 @@ class Level {
             newbutton.animations.add('off', [0]);
             newbutton.animations.add('on', [1]);
             newbutton.animations.play('off');
+            newbutton.moveableLayer = this.moveableLayers[element.properties[0].value];
+            newbutton.on = 0;
             this.buttons.add(newbutton);
-        });
+        });  
         var leverObjs = this.findObjectsByType('lever', 'objectsLayer')
         leverObjs.forEach((leverObj) => {
             var lever = this.game.add.sprite(leverObj.x + this.map.tileWidth / 2, leverObj.y + this.map.tileWidth / 2, 'lever');
@@ -473,6 +475,8 @@ class Level {
         }
         this.buttons.forEach((b) => {
             b.animations.play('off');
+            b.on = 0;
+            b.moveableLayer.kill();
         });
         this.players.forEach((p) => {
             this.buttons.forEach((b) => {
@@ -483,6 +487,8 @@ class Level {
                         if(p.bottom >= b.top)
                         {
                             b.animations.play('on');
+                            b.on = 1;
+                            b.moveableLayer.revive();
                         }
                     }
                 }
