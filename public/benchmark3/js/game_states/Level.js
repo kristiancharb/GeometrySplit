@@ -175,7 +175,7 @@ class Level {
         interactButton.onDown.add(() => {
             this.levers.forEach((lever) => {
                 if(this.currentPlayer.overlap(lever)) {
-                    this.game.sound.play('lever');
+                    this.game.sound.play('lever', 1.5);
                     lever.scale.x *= -1;
                     if(lever.moveableLayer.alive) {
                         lever.moveableLayer.kill();
@@ -301,7 +301,7 @@ class Level {
 
         if(this.jumpButton.isDown && (this.currentPlayer.body.onFloor() ||
             this.currentPlayer.body.touching.down)){
-                this.game.sound.play('jump');
+                this.game.sound.play('jump', 0.75);
                 this.currentPlayer.body.velocity.y = -700;
         }
     }
@@ -510,6 +510,11 @@ class Level {
                     {
                         if(p.bottom >= b.top)
                         {
+                            // TODO: I'm leaving this commented out until I figure out how to fix it.
+                            // Right now it just causes the sound to play over and over again, every frame
+                            /*if(b.animations.name == 'off'){
+                                this.game.sound.play('lever', 1.5);
+                            }*/
                             b.animations.play('on');
                         }
                     }
