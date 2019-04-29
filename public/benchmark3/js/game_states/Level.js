@@ -441,9 +441,11 @@ class Level {
             this.game.physics.arcade.collide(this.players, layer);
         })
         this.filterLayers.forEach((layer) => {
-            if(this.currentPlayer.tint != layer.filterColor) {
-                this.game.physics.arcade.collide(this.players, layer);
+            this.players.forEach((p) => {   
+            if(p.tint != layer.filterColor) {
+                this.game.physics.arcade.collide(p, layer);
             }
+            })
         })
         this.game.physics.arcade.collide(this.players, this.players, (p1, p2) => {
             if(p1 === p2) {
