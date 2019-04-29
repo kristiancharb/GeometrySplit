@@ -114,7 +114,6 @@ class Level {
         this.players = this.game.add.group();
         this.enemies = this.game.add.group();
         this.hazards = this.game.add.group();
-        this.enemies = this.game.add.group();
         this.buttons = this.game.add.group();
     
         // In the objects layer, the tilemap has a tile with the property playerStart
@@ -137,8 +136,10 @@ class Level {
             newbutton.animations.add('off', [0]);
             newbutton.animations.add('on', [1]);
             newbutton.animations.play('off');
+            newbutton.moveableLayer = this.moveableLayers[element.properties[0].value];
+            newbutton.on = 0;
             this.buttons.add(newbutton);
-        });
+        });  
         var leverObjs = this.findObjectsByType('lever', 'objectsLayer')
         leverObjs.forEach((leverObj) => {
             var lever = this.game.add.sprite(leverObj.x + this.map.tileWidth / 2, leverObj.y + this.map.tileWidth / 2, 'lever');
@@ -156,6 +157,7 @@ class Level {
             enemy.animations.add('current', [0, 1, 2, 1], 8);
             enemy.animations.play('current', 8, true);
             enemy.body.collideWorldBounds = true;
+            enemy.scale.setTo(0.75, 0.75)
             enemy.body.gravity.y = 1000;
             enemy.direction = Math.random() > 0.5 ? -1 : 1;
             this.enemies.add(enemy);
@@ -392,16 +394,15 @@ class Level {
     // resize current player, and set the current player
     // to be new player
     split() {
-        var newWidth = Math.sqrt(2) * this.currentPlayer.width / 2;
-        var scale = newWidth / this.originalSize;
+        var newWidth = this.currentPlayer.width / 2;
         var newX = this.getNewPlayerXCoord(this.currentPlayer.body.bottom - newWidth, newWidth);
-        if(newX && scale >= 0.5) {
+        if(newX && newWidth / this.originalSize >= 0.45) {
             this.game.sound.play('split');
             var newPlayer = this.game.add.sprite(newX, this.currentPlayer.y, 'player');
             this.playerSetUp(newPlayer);
-            newPlayer.scale.setTo(scale, scale);
+            newPlayer.scale.setTo(0.5, 0.5);
             newPlayer.tint = this.currentPlayer.tint;
-            this.currentPlayer.scale.setTo(scale, scale);
+            this.currentPlayer.scale.setTo(0.5, 0.5);
         } else {
             console.log('SPLIT FAILED')
         }
@@ -410,10 +411,9 @@ class Level {
     // Remove player 2 and resize player 1 to be twice
     // previous size
     merge(p1, p2) {
-        var newWidth = 2 * Math.sqrt(Math.pow(this.currentPlayer.width, 2) / 2)
+        var newWidth = this.currentPlayer.width * 2
         if(this.isXYCoordClear(p1.x, p1.body.bottom - newWidth, newWidth)) {
-            var scale = newWidth / this.originalSize;
-            p1.scale.setTo(scale, scale);
+            p1.scale.setTo(1, 1);
             p1.body.y -= newWidth / 2
             this.players.remove(p2);
             if(this.currentPlayer === p1 || this.currentPlayer === p2) {
@@ -501,6 +501,8 @@ class Level {
         }
         this.buttons.forEach((b) => {
             b.animations.play('off');
+            b.on = 0;
+            b.moveableLayer.kill();
         });
         this.players.forEach((p) => {
             this.buttons.forEach((b) => {
@@ -516,6 +518,8 @@ class Level {
                                 this.game.sound.play('lever', 1.5);
                             }*/
                             b.animations.play('on');
+                            b.on = 1;
+                            b.moveableLayer.revive();
                         }
                     }
                 }
