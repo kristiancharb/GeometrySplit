@@ -8,11 +8,13 @@ GeometrySplit.MainMenu = function () { };
 GeometrySplit.MainMenu.prototype = {
     preload: function () {
 
-      
+      this.game.load.audio('loop', 'assets/audio/Retro Beat.ogg');
+      this.game.add.audio('loop');
 
     },
     create: function () {
-
+      this.game.sound.stopAll();
+      this.game.sound.play('loop', 0.75, true);
       this.game.stage.backgroundColor = '#fff';
 
       GeometrySplit.game.add.text(30, 300-50, 'Geometry', { 'fontSize': '7.5em' });

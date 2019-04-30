@@ -1,4 +1,6 @@
+
 class Level {
+    
     constructor(game) {
         this.game = game;
         this.map;
@@ -27,6 +29,13 @@ class Level {
         this.upButton;
         this.downButton;
         this.invinc;
+        this.audio_files = {
+            'jump': 'gs_jump.wav',
+            'land': 'gs_land.wav',
+            'lever': 'gs_lever.wav',
+            'split': 'gs_split.wav',
+            'loop': 'Retro Comedy.ogg',
+        };
     }
 
     preload(levelPath) {
@@ -44,9 +53,18 @@ class Level {
         this.game.load.spritesheet('button', 'assets/button.png', 32, 16,2);
         this.game.load.image('tiles', 'assets/tileset.png');
 
+        //this.game.load.audio('jump', 'assets/audio/gs_jump.wav');
+        for (var file in this.audio_files){
+            //console.log(file+', '+'assets/audio/' + this.audio_files[file]);
+            this.game.load.audio(file, 'assets/audio/' + this.audio_files[file]);
+            this.game.add.audio(file);
+        }
+        
+
         let menuKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
         menuKey.onDown.add(() => {
             this.game.paused = false;
+            this.game.sound.stopAll();
             this.game.state.start('MainMenu');
         });
 
@@ -57,6 +75,9 @@ class Level {
     }
 
     create() {
+        this.game.sound.stopAll();
+        this.game.sound.play('loop', 0.75, true);
+
         this.map = this.game.add.tilemap('map');
         this.map.addTilesetImage('tileset', 'tiles');
         this.backgroundlayer = this.map.createLayer('backgroundLayer');
@@ -156,6 +177,7 @@ class Level {
         interactButton.onDown.add(() => {
             this.levers.forEach((lever) => {
                 if(this.currentPlayer.overlap(lever)) {
+                    this.game.sound.play('lever', 1.5);
                     lever.scale.x *= -1;
                     if(lever.moveableLayer.alive) {
                         lever.moveableLayer.kill();
@@ -280,8 +302,9 @@ class Level {
         }
 
         if(this.jumpButton.isDown && (this.currentPlayer.body.onFloor() ||
-           this.currentPlayer.body.touching.down)){
-            this.currentPlayer.body.velocity.y = -700;
+            this.currentPlayer.body.touching.down)){
+                this.game.sound.play('jump', 0.75);
+                this.currentPlayer.body.velocity.y = -700;
         }
     }
 
@@ -374,6 +397,7 @@ class Level {
         var newWidth = this.currentPlayer.width / 2;
         var newX = this.getNewPlayerXCoord(this.currentPlayer.body.bottom - newWidth, newWidth);
         if(newX && newWidth / this.originalSize >= 0.45) {
+            this.game.sound.play('split');
             var newPlayer = this.game.add.sprite(newX, this.currentPlayer.y, 'player');
             this.playerSetUp(newPlayer);
             newPlayer.scale.setTo(0.5, 0.5);
@@ -468,6 +492,8 @@ class Level {
                         {
                             if(p.bottom  > h.top)
                             {
+                                this.game.sound.play('land');
+                                this.game.sound.stopAll();
                                 this.game.state.restart();
                             }
                         }
@@ -488,6 +514,11 @@ class Level {
                     {
                         if(p.bottom >= b.top)
                         {
+                            // TODO: I'm leaving this commented out until I figure out how to fix it.
+                            // Right now it just causes the sound to play over and over again, every frame
+                            /*if(b.animations.name == 'off'){
+                                this.game.sound.play('lever', 1.5);
+                            }*/
                             b.animations.play('on');
                             b.on = 1;
                             b.moveableLayer.revive();
