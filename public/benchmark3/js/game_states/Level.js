@@ -29,6 +29,7 @@ class Level {
         this.upButton;
         this.downButton;
         this.invinc;
+        this.jumpBuffer;
         this.audio_files = {
             'jump': 'gs_jump.wav',
             'land': 'gs_land.wav',
@@ -261,6 +262,7 @@ class Level {
         }
         if (this.rainbowFlag == 1)
             this.cycleRainbow();
+        this.jumpBuffer++;
         this.updateCollisions();
         this.checkLocks();
     
@@ -300,11 +302,11 @@ class Level {
         {
             this.currentPlayer.y += 5;
         }
-
         if(this.jumpButton.isDown && (this.currentPlayer.body.onFloor() ||
-            this.currentPlayer.body.touching.down)){
+            this.currentPlayer.body.touching.down || this.jumpBuffer <= 3)){
                 this.game.sound.play('jump', 0.75);
                 this.currentPlayer.body.velocity.y = -700;
+                this.jumpBuffer = 50;
         }
     }
 
@@ -451,7 +453,12 @@ class Level {
     // layer and between every player and other player (merge if same size)
     updateCollisions() {
         if (this.walkThroughWalls == 0)
-            this.game.physics.arcade.collide(this.players, this.blockedLayer);
+        {
+            this.game.physics.arcade.collide(this.players, this.blockedLayer, (p,b) => {
+                if (p == this.currentPlayer && (this.currentPlayer.body.onFloor() || this.currentPlayer.body.touching.down))
+                    this.jumpBuffer = 0;
+            });
+        }
         this.game.physics.arcade.collide(this.enemies, this.blockedLayer, (enemy, _) => {
             if(enemy.body.blocked.right) {
                 enemy.direction = -1;
