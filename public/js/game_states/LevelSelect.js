@@ -88,6 +88,4 @@ GeometrySplit.LevelSelect.prototype = {
       }, this);
 
   },
-
-  },
 };
