@@ -20,7 +20,7 @@ GeometrySplit.Help.prototype = {
 
         let lorem = 'You can split yourself into two pieces and switch control between these pieces. ' + 
         'When you\'re ready to put your pieces back together just collide together from the side and your pieces will merge ' + 
-        'Use your splitting ability to an advantage! You\'ll soon realize that your split pieces can get to places that a '
+        'Use your splitting ability to an advantage! You\'ll soon realize that your split pieces can get to places that a ' + 
         'whole you can\'t. To finish a level, just make sure you put yourself back together and walk through the door.'
         let backstory = 'You are Test Subject 117, the first successful experiment by Incorporated Inc. to inject consciousness into a geometric host. You realize the experiments lead to some nasty side-effects, such as giving you the ability to split up your body. Use this ability to escape this terrifying geometric world!'
 
