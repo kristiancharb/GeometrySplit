@@ -23,18 +23,25 @@ GeometrySplit.LevelSelect.prototype = {
 
       buttonStart = GeometrySplit.game.add.text(30, 300, 'Stage 1', {});
       buttonStart.inputEnabled = true;
-      buttonStart.events.onInputDown.add((e) => {
-        GeometrySplit.levelNum = 1;
-        GeometrySplit.game.state.start('Game');
-      }, this);
+      buttonStart.addColor('#d3d3d3', 0);
+      if(this.game.levelCount >= 1) {
+        buttonStart.addColor('#000000', 0);
+        buttonStart.events.onInputDown.add((e) => {
+          GeometrySplit.levelNum = 1;
+          GeometrySplit.game.state.start('Game');
+        }, this);
+      }
 
       buttonStart2 = GeometrySplit.game.add.text(30, 300+50, 'Stage 2', {});
       buttonStart2.inputEnabled = true;
-      //buttonStart2.addColor('#d3d3d3', 0);
-      buttonStart2.events.onInputDown.add((e) => {
-        GeometrySplit.levelNum = 2;
-        GeometrySplit.game.state.start('Game');
-      }, this);
+      buttonStart2.addColor('#d3d3d3', 0);
+      if(this.game.levelCount >= 2) {
+        buttonStart2.addColor('#000000', 0);
+        buttonStart2.events.onInputDown.add((e) => {
+          GeometrySplit.levelNum = 2;
+          GeometrySplit.game.state.start('Game');
+        }, this);
+      }
 
       buttonStart3 = GeometrySplit.game.add.text(30, 300+100, 'Stage 3', {});
       buttonStart3.inputEnabled = true;
