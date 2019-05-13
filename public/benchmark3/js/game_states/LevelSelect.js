@@ -72,7 +72,7 @@ GeometrySplit.LevelSelect.prototype = {
         GeometrySplit.levelNum = 7;
         GeometrySplit.game.state.start('Game');
       }, this);
-      buttonStart8 = GeometrySplit.game.add.text(150, 300+150, 'Stage 7 - BONUS', {});
+      buttonStart8 = GeometrySplit.game.add.text(150, 300+150, 'BONUS STAGE', {});
       buttonStart8.inputEnabled = true;
       //buttonStart5.addColor('#d3d3d3', 0);
       buttonStart8.events.onInputDown.add((e) => {
