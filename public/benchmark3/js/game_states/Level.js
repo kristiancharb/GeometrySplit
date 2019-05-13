@@ -470,6 +470,7 @@ class Level {
         Object.keys(this.moveableLayers).forEach((key) => {
             var layer = this.moveableLayers[key]
             this.game.physics.arcade.collide(this.players, layer);
+            this.game.physics.arcade.collide(this.enemies, layer);
         })
         this.filterLayers.forEach((layer) => {
             this.players.forEach((p) => {   
