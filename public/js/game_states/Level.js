@@ -60,7 +60,7 @@ class Level {
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.load.tilemap('map', levelPath, null, Phaser.Tilemap.TILED_JSON);
         this.game.load.spritesheet('player', 'assets/square-sprite2.png', 72, 64, 3);
-        this.game.load.spritesheet('door', 'assets/door-sprite-green.png', 32, 64, 1);
+        this.game.load.spritesheet('door', 'assets/door-sprite-white.png', 32, 64, 1);
         this.game.load.spritesheet('lever', 'assets/lever-sprite.png', 32, 32);
         this.game.load.spritesheet('spike', 'assets/spike.png',32,32,1);
         this.game.load.spritesheet('button', 'assets/button.png', 32, 16,2);
@@ -122,6 +122,7 @@ class Level {
         var exitObj = this.findObjectsByType('exit', 'objectsLayer');
         this.exit = this.game.add.sprite(exitObj[0].x, exitObj[0].y, 'door');
         this.exit.enableBody = true;
+        this.exit.tint = 0xA4DB77;
 
         this.game.physics.arcade.gravity.y = 1000;
 
@@ -375,7 +376,7 @@ class Level {
     }
 
     checkLevelComplete() {
-        if(this.currentPlayer.overlap(this.exit) && (this.currentPlayer.body.right - this.exit.x) > (this.exit.width / 2)) {
+        if(this.currentPlayer.overlap(this.exit) && (this.currentPlayer.body.right - this.exit.x) > (this.exit.width / 2) && (this.exit.tint == 0xA4DB77)) {
             if(this.game.logging)
                 console.log('LEVEL COMPLETE');
             if(this.game.levelCount <= GeometrySplit.levelNum){
@@ -440,6 +441,7 @@ class Level {
             this.currentPlayer.body.setSize(64, 64, 2, 0)
             newPlayer.tint = this.currentPlayer.tint;
             this.currentPlayer.scale.setTo(0.5, 0.5);
+            this.exit.tint = 0xD15555;
         } else {
             if(this.game.logging)
                 console.log('SPLIT FAILED')
@@ -456,7 +458,8 @@ class Level {
             this.currentPlayer = p1;
             this.game.camera.follow(p1);
             this.currentPlayer.animations.play('current', 8, true);
-            this.currentPlayer.body.setSize(64, 64, 4, 0) 
+            this.currentPlayer.body.setSize(64, 64, 4, 0);
+            this.exit.tint = 0xA4DB77;
         }else if(this.isXYCoordClear(p2.x, p2.body.bottom - 48, 64)) {
             p2.scale.setTo(1, 1);
             p2.body.y -= 32
@@ -464,7 +467,8 @@ class Level {
             this.currentPlayer = p2;
             this.game.camera.follow(p2);
             this.currentPlayer.animations.play('current', 8, true);
-            this.currentPlayer.body.setSize(64, 64, 4, 0)
+            this.currentPlayer.body.setSize(64, 64, 4, 0);
+            this.exit.tint = 0xA4DB77;
         }else if(this.currentPlayer === p1 || this.currentPlayer === p2) {
             if(this.game.logging)
                 console.log('merge failed')
