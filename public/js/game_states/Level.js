@@ -36,6 +36,7 @@ class Level {
             'land': 'gs_land.wav',
             'lever': 'gs_lever.wav',
             'split': 'gs_split.wav',
+            'die': 'gs_die.wav',
             'loop': 'Retro Comedy.ogg',
         };
     }
@@ -81,6 +82,7 @@ class Level {
 
     create() {
         this.game.sound.stopAll();
+        this.game.sound.play('die', 1.5);
         this.game.sound.play('loop', 0.75, true);
 
         this.map = this.game.add.tilemap('map');
@@ -188,7 +190,7 @@ class Level {
         interactButton.onDown.add(() => {
             this.levers.forEach((lever) => {
                 if(this.currentPlayer.overlap(lever)) {
-                    this.game.sound.play('lever', 1.5);
+                    this.game.sound.play('lever', 2.5);
                     lever.scale.x *= -1;
                     if(lever.moveableLayer.alive) {
                         lever.moveableLayer.kill();
@@ -423,7 +425,7 @@ class Level {
     split() {
         var newX = this.getNewPlayerXCoord(this.currentPlayer.body.bottom - 32, 32);
         if(newX && this.currentPlayer.body.width === 64) {
-            this.game.sound.play('split');
+            this.game.sound.play('split', 2.5);
             var newPlayer = this.game.add.sprite(newX, this.currentPlayer.y, 'player');
             this.playerSetUp(newPlayer);
             newPlayer.scale.setTo(0.5, 0.5);
@@ -549,27 +551,22 @@ class Level {
         }
         this.buttons.forEach((b) => {
             b.animations.play('off');
-            b.on = 0;
+            //b.on = 0;
             b.moveableLayer.kill();
         });
         this.players.forEach((p) => {
             this.buttons.forEach((b) => {
-                if (p.overlap(b))
-                {
-                    if (p.right > b.left)
-                    {
-                        if(p.bottom >= b.top)
-                        {
-                            // TODO: I'm leaving this commented out until I figure out how to fix it.
-                            // Right now it just causes the sound to play over and over again, every frame
-                            /*if(b.animations.name == 'off'){
-                                this.game.sound.play('lever', 1.5);
-                            }*/
-                            b.animations.play('on');
-                            b.on = 1;
-                            b.moveableLayer.revive();
-                        }
+                if(p.overlap(b) && (p.bottom >= b.top && p.right > b.left)){
+                    if(b.on == 0){
+                        this.game.sound.play('lever', 2.5);
                     }
+                    b.animations.play('on');
+                    b.on = 1;
+                    b.moveableLayer.revive();
+                } else {
+                    //b.animations.play('off');
+                    b.on = 0;
+                    //b.moveableLayer.kill();
                 }
             });
         });
