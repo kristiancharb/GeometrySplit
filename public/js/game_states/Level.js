@@ -37,14 +37,14 @@ class Level {
             'lever': 'gs_lever.wav',
             'split': 'gs_split.wav',
             'die': 'gs_die.wav',
-            'loop1': 'Retro Mystic.ogg',
-            'loop2': 'Retro Comedy.ogg',
-            'loop3': 'Retro Comedy.ogg',
+            'loop1': 'Retro Polka.ogg',
+            'loop2': 'Retro Polka.ogg',
+            'loop3': 'Retro Mystic.ogg',
             'loop4': 'Retro Comedy.ogg',
-            'loop5': 'Retro Comedy.ogg',
-            'loop6': 'Retro Comedy.ogg',
-            'loop7': 'Retro Comedy.ogg',
-            'loop8': 'Retro Comedy.ogg',
+            'loop5': 'Retro Reggae.ogg',
+            'loop6': 'Retro Reggae.ogg',
+            'loop7': 'Retro Mystic.ogg',
+            'loop8': 'Retro Mystic.ogg',
         };
     }
 
