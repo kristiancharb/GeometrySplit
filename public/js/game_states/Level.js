@@ -323,7 +323,7 @@ class Level {
         if(this.jumpButton.isDown && this.game.time.now > this.jumptimer){
             if(this.currentPlayer.body.onFloor() ||
             this.currentPlayer.body.touching.down || this.jumpBuffer <= 3) {
-                this.game.sound.play('jump', 0.75);
+                this.game.sound.play('jump', 0.5);
                 this.currentPlayer.body.velocity.y = -700;
                 this.jumpBuffer = 50;
                 this.jumptimer = this.game.time.now + 500;
@@ -550,21 +550,23 @@ class Level {
             //b.on = 0;
             b.moveableLayer.kill();
         });
-        this.players.forEach((p) => {
-            this.buttons.forEach((b) => {
-                if(p.overlap(b) && (p.bottom >= b.top && p.right > b.left)){
-                    if(b.on == 0){
-                        this.game.sound.play('lever', 2.5);
-                    }
-                    b.animations.play('on');
-                    b.on = 1;
-                    b.moveableLayer.revive();
-                } else {
-                    //b.animations.play('off');
-                    b.on = 0;
-                    //b.moveableLayer.kill();
+        this.buttons.forEach((b) => {
+            let flag = false;
+            this.players.forEach((p) => {
+                if(p.overlap(b) && p.bottom >= b.top && p.right > b.left) {
+                    flag = true;
                 }
             });
+            if(flag){
+                if(b.on == 0){
+                    this.game.sound.play('lever', 2.5);
+                }
+                b.animations.play('on');
+                b.on = 1;
+                b.moveableLayer.revive();
+            }else{
+                b.on = 0;
+            }
         });
         // maybe remove this part once spawning is improved?
         this.game.physics.arcade.overlap(this.players, this.players, (p1, p2) => {
