@@ -383,7 +383,8 @@ class Level {
                 this.game.levelCount = GeometrySplit.levelNum + 1;
             }
             this.currentPlayer.kill();
-            this.game.state.start('LevelSelect');
+            GeometrySplit.levelNum++;
+            GeometrySplit.game.state.start('Game');
         }
     }
     
