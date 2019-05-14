@@ -378,12 +378,12 @@ class Level {
         if(this.currentPlayer.overlap(this.exit) && (this.currentPlayer.body.right - this.exit.x) > (this.exit.width / 2)) {
             if(this.game.logging)
                 console.log('LEVEL COMPLETE');
-            //TEMP (go to next level)
             if(this.game.levelCount <= GeometrySplit.levelNum){
                 this.game.levelCount = GeometrySplit.levelNum + 1;
             }
             this.currentPlayer.kill();
-            this.game.state.start('LevelSelect');
+            GeometrySplit.levelNum++;
+            GeometrySplit.game.state.start('Game');
         }
     }
     
