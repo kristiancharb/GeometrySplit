@@ -51,7 +51,7 @@ class Level {
         this.game.scale.pageAlignVertically = true;
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.load.tilemap('map', levelPath, null, Phaser.Tilemap.TILED_JSON);
-        this.game.load.spritesheet('player', 'assets/square-sprite2.png', 80, 64, 3);
+        this.game.load.spritesheet('player', 'assets/square-sprite3.png', 80, 64, 3);
         this.game.load.spritesheet('door', 'assets/door-sprite-green.png', 32, 64, 1);
         this.game.load.spritesheet('lever', 'assets/lever-sprite.png', 32, 32);
         this.game.load.spritesheet('spike', 'assets/spike.png',32,32,1);
