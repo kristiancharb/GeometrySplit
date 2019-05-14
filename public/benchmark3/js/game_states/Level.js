@@ -8,6 +8,7 @@ class Level {
         this.blockedLayer;
         this.moveableLayers = {};
         this.filterLayers = Array();
+        this.jumptimer = 0;
         this.currentPlayer;
         this.exit;
         this.levers = Array();
@@ -47,7 +48,7 @@ class Level {
         this.game.scale.pageAlignVertically = true;
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.load.tilemap('map', levelPath, null, Phaser.Tilemap.TILED_JSON);
-        this.game.load.spritesheet('player', 'assets/square-sprite.png', 64, 64, 3);
+        this.game.load.spritesheet('player', 'assets/square-sprite2.png', 80, 64, 3);
         this.game.load.spritesheet('door', 'assets/door-sprite.png', 32, 64, 1);
         this.game.load.spritesheet('lever', 'assets/lever-sprite.png', 32, 32);
         this.game.load.spritesheet('spike', 'assets/spike.png',32,32,1);
@@ -168,6 +169,12 @@ class Level {
         //set up controls
         this.cursors = this.game.input.keyboard.createCursorKeys();
         this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        this.jumpButton.onUp.add(() => {
+            if(this.currentPlayer.body.velocity.y < 0) {
+                this.currentPlayer.body.velocity.y = 0;
+                this.jumptimer = 0;
+            }
+        });
         var splitButton = this.game.input.keyboard.addKey(Phaser.Keyboard.R);
         splitButton.onDown.add(() => this.split());
         var cycleLeftButton = this.game.input.keyboard.addKey(Phaser.Keyboard.Q);
@@ -257,7 +264,7 @@ class Level {
     }
 
     update() {
-        if(Math.floor(this.currentPlayer.body.width) === this.originalSize) {
+        if(this.currentPlayer.body.width === 64) {
             this.checkLevelComplete();
         }
         if (this.rainbowFlag == 1)
@@ -302,11 +309,14 @@ class Level {
         {
             this.currentPlayer.y += 5;
         }
-        if(this.jumpButton.isDown && (this.currentPlayer.body.onFloor() ||
-            this.currentPlayer.body.touching.down || this.jumpBuffer <= 3)){
+        if(this.jumpButton.isDown && this.game.time.now > this.jumptimer){
+            if(this.currentPlayer.body.onFloor() ||
+            this.currentPlayer.body.touching.down || this.jumpBuffer <= 3) {
                 this.game.sound.play('jump', 0.75);
                 this.currentPlayer.body.velocity.y = -700;
                 this.jumpBuffer = 50;
+                this.jumptimer = this.game.time.now + 500;
+            } 
         }
     }
 
@@ -370,6 +380,7 @@ class Level {
     playerSetUp(p) {
         this.game.physics.arcade.enable(p);
         p.animations.add('current', [0, 1, 2, 1], 8);
+        p.body.setSize(64, 64, 8, 0)
         p.body.collideWorldBounds = true;
         p.body.gravity.y = 1000;
         p.body.maxVelocity.y = 850;
@@ -396,13 +407,14 @@ class Level {
     // resize current player, and set the current player
     // to be new player
     split() {
-        var newWidth = this.currentPlayer.width / 2;
-        var newX = this.getNewPlayerXCoord(this.currentPlayer.body.bottom - newWidth, newWidth);
-        if(newX && newWidth / this.originalSize >= 0.45) {
+        var newX = this.getNewPlayerXCoord(this.currentPlayer.body.bottom - 32, 32);
+        if(newX && this.currentPlayer.body.width === 64) {
             this.game.sound.play('split');
             var newPlayer = this.game.add.sprite(newX, this.currentPlayer.y, 'player');
             this.playerSetUp(newPlayer);
             newPlayer.scale.setTo(0.5, 0.5);
+            newPlayer.body.setSize(64, 64, 4, 0)
+            this.currentPlayer.body.setSize(64, 64, 4, 0)
             newPlayer.tint = this.currentPlayer.tint;
             this.currentPlayer.scale.setTo(0.5, 0.5);
         } else {
@@ -413,17 +425,18 @@ class Level {
     // Remove player 2 and resize player 1 to be twice
     // previous size
     merge(p1, p2) {
-        var newWidth = this.currentPlayer.width * 2
-        if(this.isXYCoordClear(p1.x, p1.body.bottom - newWidth, newWidth)) {
+        if(this.isXYCoordClear(p1.x, p1.body.bottom - 32, 64)) {
             p1.scale.setTo(1, 1);
-            p1.body.y -= newWidth / 2
+            p1.body.y -= 32
             this.players.remove(p2);
             if(this.currentPlayer === p1 || this.currentPlayer === p2) {
                 this.currentPlayer = p1;
                 this.game.camera.follow(p1);
                 this.currentPlayer.animations.play('current', 8, true);
+                this.currentPlayer.body.setSize(64, 64, 8, 0)
             }
         } else if(this.currentPlayer === p1 || this.currentPlayer === p2) {
+            console.log('merge failed')
             this.setLocks(p1, p2);
         }
     }
@@ -470,6 +483,7 @@ class Level {
         Object.keys(this.moveableLayers).forEach((key) => {
             var layer = this.moveableLayers[key]
             this.game.physics.arcade.collide(this.players, layer);
+            this.game.physics.arcade.collide(this.enemies, layer);
         })
         this.filterLayers.forEach((layer) => {
             this.players.forEach((p) => {   
@@ -577,12 +591,12 @@ class Level {
                 return false;
             }
             var hit = false;
-            this.players.forEach((p) => {
-                if(p.body.hitTest(x + i, y)) {
-                    hit = true;
-                    return;
-                }
-            })
+            // this.players.forEach((p) => {
+            //     if(p.body.hitTest(x + i, y)) {
+            //         hit = true;
+            //         return;
+            //     }
+            // })
             if(hit) {
                 return false;
             }
