@@ -407,6 +407,8 @@ class Level {
         p.body.setSize(64, 64, 4, 0)
         p.body.collideWorldBounds = true;
         p.body.gravity.y = 1000;
+        if(this.noGravity == 1)
+            p.body.gravity.y = 0;
         p.body.maxVelocity.y = 850;
         p.body.bounce = {x: 0, y: 0};
         p.tint = 0xA4DB77;
@@ -514,7 +516,8 @@ class Level {
                 enemy.direction = 1;
             }
         });
-        this.game.physics.arcade.collide(this.players, this.enemies, () => this.game.state.restart());
+        if(this.invinc == 0)
+            this.game.physics.arcade.collide(this.players, this.enemies, () => this.game.state.restart());
         Object.keys(this.moveableLayers).forEach((key) => {
             var layer = this.moveableLayers[key]
             this.game.physics.arcade.collide(this.players, layer);
