@@ -51,7 +51,7 @@ class Level {
         this.game.scale.pageAlignVertically = true;
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.load.tilemap('map', levelPath, null, Phaser.Tilemap.TILED_JSON);
-        this.game.load.spritesheet('player', 'assets/square-sprite2.png', 80, 64, 3);
+        this.game.load.spritesheet('player', 'assets/square-sprite2.png', 72, 64, 3);
         this.game.load.spritesheet('door', 'assets/door-sprite-green.png', 32, 64, 1);
         this.game.load.spritesheet('lever', 'assets/lever-sprite.png', 32, 32);
         this.game.load.spritesheet('spike', 'assets/spike.png',32,32,1);
@@ -394,7 +394,7 @@ class Level {
     playerSetUp(p) {
         this.game.physics.arcade.enable(p);
         p.animations.add('current', [0, 1, 2, 1], 8);
-        p.body.setSize(64, 64, 8, 0)
+        p.body.setSize(64, 64, 4, 0)
         p.body.collideWorldBounds = true;
         p.body.gravity.y = 1000;
         p.body.maxVelocity.y = 850;
@@ -427,8 +427,8 @@ class Level {
             var newPlayer = this.game.add.sprite(newX, this.currentPlayer.y, 'player');
             this.playerSetUp(newPlayer);
             newPlayer.scale.setTo(0.5, 0.5);
-            newPlayer.body.setSize(64, 64, 4, 0)
-            this.currentPlayer.body.setSize(64, 64, 4, 0)
+            newPlayer.body.setSize(64, 64, 2, 0)
+            this.currentPlayer.body.setSize(64, 64, 2, 0)
             newPlayer.tint = this.currentPlayer.tint;
             this.currentPlayer.scale.setTo(0.5, 0.5);
         } else {
@@ -440,26 +440,22 @@ class Level {
     // Remove player 2 and resize player 1 to be twice
     // previous size
     merge(p1, p2) {
-        if(this.isXYCoordClear(p1.x, p1.body.bottom - 32, 64)) {
+        if(this.isXYCoordClear(p1.x, p1.body.bottom - 48, 64)) {
             p1.scale.setTo(1, 1);
             p1.body.y -= 32
             this.players.remove(p2);
-            if(this.currentPlayer === p1 || this.currentPlayer === p2) {
-                this.currentPlayer = p1;
-                this.game.camera.follow(p1);
-                this.currentPlayer.animations.play('current', 8, true);
-                this.currentPlayer.body.setSize(64, 64, 8, 0)
-            }
-        }else if(this.isXYCoordClear(p2.x, p2.body.bottom - 32, 64)) {
+            this.currentPlayer = p1;
+            this.game.camera.follow(p1);
+            this.currentPlayer.animations.play('current', 8, true);
+            this.currentPlayer.body.setSize(64, 64, 4, 0) 
+        }else if(this.isXYCoordClear(p2.x, p2.body.bottom - 48, 64)) {
             p2.scale.setTo(1, 1);
             p2.body.y -= 32
             this.players.remove(p1);
-            if(this.currentPlayer === p2 || this.currentPlayer === p2) {
-                this.currentPlayer = p2;
-                this.game.camera.follow(p2);
-                this.currentPlayer.animations.play('current', 8, true);
-                this.currentPlayer.body.setSize(64, 64, 8, 0)
-            }
+            this.currentPlayer = p2;
+            this.game.camera.follow(p2);
+            this.currentPlayer.animations.play('current', 8, true);
+            this.currentPlayer.body.setSize(64, 64, 4, 0)
         }else if(this.currentPlayer === p1 || this.currentPlayer === p2) {
             if(this.game.logging)
                 console.log('merge failed')
@@ -512,16 +508,16 @@ class Level {
         })
         this.filterLayers.forEach((layer) => {
             this.players.forEach((p) => {   
-            if(p.tint != layer.filterColor) {
-                this.game.physics.arcade.collide(p, layer);
-            }
+                if(p.tint != layer.filterColor) {
+                    this.game.physics.arcade.collide(p, layer);
+                }
             })
         })
         this.game.physics.arcade.collide(this.players, this.players, (p1, p2) => {
             if(p1 === p2) {
                 return;
             }
-            if(Math.abs(p1.width - p2.width) < 1 && Math.abs(p1.y - p2.y) < 1 &&
+            if(Math.abs(p1.width - p2.width) < 1 && Math.abs(p1.y - p2.y) < 20 &&
                p1.tint == p2.tint) {
                 this.merge(p1, p2);
             } else if(this.currentPlayer === p1 || this.currentPlayer === p2) {
