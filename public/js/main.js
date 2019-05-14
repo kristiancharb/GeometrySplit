@@ -9,4 +9,7 @@ GeometrySplit.game.state.add('Game', GeometrySplit.Game);
 GeometrySplit.game.state.add('Controls', GeometrySplit.Controls);
 GeometrySplit.game.state.add('Help', GeometrySplit.Help);
 
+// Set to false before deploying
+GeometrySplit.game.logging = false;
+
 GeometrySplit.game.state.start('Load');

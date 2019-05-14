@@ -13,7 +13,7 @@ GeometrySplit.Load.prototype = {
     },
     create: function () {
         this.game.time.events.add(
-            Phaser.Timer.SECOND * 2,
+            Phaser.Timer.SECOND * 1,
             ()=>{this.state.start('MainMenu');},
             this
         );

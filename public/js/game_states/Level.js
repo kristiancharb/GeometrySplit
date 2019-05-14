@@ -41,9 +41,11 @@ class Level {
     }
 
     preload(levelPath) {
-        console.log('Level Unlock: ' + this.game.levelCount);
-        console.log('LEVEL PATH')
-        console.log(levelPath)
+        if(this.game.logging == true){
+            console.log('Level Unlock: ' + this.game.levelCount);
+            console.log('LEVEL PATH')
+            console.log(levelPath)
+        }
         this.game.stage.backgroundColor = '#fff';
         this.game.scale.pageAlignHorizontally = true;
         this.game.scale.pageAlignVertically = true;
@@ -207,25 +209,29 @@ class Level {
             this.secretBuffer *= 10;
             this.secretBuffer += 1;
             this.secretBuffer %= 10000000000;
-            console.log(this.secretBuffer);
+            if(this.game.logging)
+                console.log(this.secretBuffer);
             });
         this.downButton.onDown.add(() => {
             this.secretBuffer *= 10;
             this.secretBuffer += 2;
             this.secretBuffer %= 10000000000;
-            console.log(this.secretBuffer);
+            if(this.game.logging)
+                console.log(this.secretBuffer);
             });
         leftkey.onDown.add(() => {
             this.secretBuffer *= 10;
             this.secretBuffer += 3;
             this.secretBuffer %= 10000000000;
-            console.log(this.secretBuffer);
+            if(this.game.logging)
+                console.log(this.secretBuffer);
             });
         rightkey.onDown.add(() => {
             this.secretBuffer *= 10;
             this.secretBuffer += 4;
             this.secretBuffer %= 10000000000;
-            console.log(this.secretBuffer);
+            if(this.game.logging)
+                console.log(this.secretBuffer);
             });
         bkey.onDown.add(() => {
             this.secretBuffer *= 10;
@@ -239,7 +245,8 @@ class Level {
                     p.body.gravity.y = 1000;
                 });
             }
-            console.log(this.secretBuffer);
+            if(this.game.logging)
+                console.log(this.secretBuffer);
             });
         akey.onDown.add(() => {
             this.secretBuffer *= 10;
@@ -257,7 +264,8 @@ class Level {
                     p.body.gravity.y = 0;
                 });
             }
-            console.log(this.secretBuffer);
+            if(this.game.logging)
+                console.log(this.secretBuffer);
             });
         ikey.onDown.add(() => {
             this.invinc = this.invinc ^ 1;
@@ -322,7 +330,8 @@ class Level {
     }
 
     cycleRainbow() {
-        console.log("Working");
+        if(this.game.logging)
+                console.log("Working");
         var tint;
         if (this.currentPlayer.tint == 0xFF0000)
             tint = 0xFF9900;
@@ -358,7 +367,8 @@ class Level {
 
     checkLevelComplete() {
         if(this.currentPlayer.overlap(this.exit) && (this.currentPlayer.body.right - this.exit.x) > (this.exit.width / 2)) {
-            console.log('LEVEL COMPLETE');
+            if(this.game.logging)
+                console.log('LEVEL COMPLETE');
             //TEMP (go to next level)
             if(this.game.levelCount <= GeometrySplit.levelNum){
                 this.game.levelCount = GeometrySplit.levelNum + 1;
@@ -422,7 +432,8 @@ class Level {
             newPlayer.tint = this.currentPlayer.tint;
             this.currentPlayer.scale.setTo(0.5, 0.5);
         } else {
-            console.log('SPLIT FAILED')
+            if(this.game.logging)
+                console.log('SPLIT FAILED')
         }
     }
     
@@ -450,7 +461,8 @@ class Level {
                 this.currentPlayer.body.setSize(64, 64, 8, 0)
             }
         }else if(this.currentPlayer === p1 || this.currentPlayer === p2) {
-            console.log('merge failed')
+            if(this.game.logging)
+                console.log('merge failed')
             this.setLocks(p1, p2);
         }
     }
