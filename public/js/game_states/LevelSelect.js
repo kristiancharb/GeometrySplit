@@ -38,7 +38,7 @@ GeometrySplit.LevelSelect.prototype = {
         button_objects[i].inputEnabled = true;
         button_objects[i].addColor('#d3d3d3', 0);
         button_objects[i].buttonNum = i+1;
-        if(this.game.levelCount >= i+1) {
+        if(this.game.levelCount >= i+1 || this.game.logging) {
           button_objects[i].addColor('#000000', 0);
           button_objects[i].events.onInputDown.add((e) => {
             GeometrySplit.levelNum = e.events.parent.buttonNum;
