@@ -15,6 +15,18 @@ GeometrySplit.LevelSelect.prototype = {
         this.state.start('MainMenu')
       });
 
+      let unlockKey = this.input.keyboard.addKey(Phaser.Keyboard.U);
+      unlockKey.onDown.add(() => {
+        this.game.levelCount = 999;
+        this.state.restart();
+      });
+
+      let lockKey = this.input.keyboard.addKey(Phaser.Keyboard.L);
+      lockKey.onDown.add(() => {
+        this.game.levelCount = 1;
+        this.state.restart();
+      });
+
       buttonBack = GeometrySplit.game.add.text(30, 50, '← Back', {});
       buttonBack.inputEnabled = true;
       buttonBack.events.onInputDown.add((e) => {
