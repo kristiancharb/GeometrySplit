@@ -190,10 +190,8 @@ class Level {
         });
         var splitButton = this.game.input.keyboard.addKey(Phaser.Keyboard.R);
         splitButton.onDown.add(() => this.split());
-        var cycleLeftButton = this.game.input.keyboard.addKey(Phaser.Keyboard.Q);
-        cycleLeftButton.onDown.add(() => this.cyclePlayer(true))
         var cycleRightButton = this.game.input.keyboard.addKey(Phaser.Keyboard.E);
-        cycleRightButton.onDown.add(() => this.cyclePlayer(false));
+        cycleRightButton.onDown.add(() => this.cyclePlayer());
         var interactButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SHIFT)
         interactButton.onDown.add(() => {
             this.levers.forEach((lever) => {
@@ -479,20 +477,14 @@ class Level {
     }
     
     // Make current player the next/prev player in group
-    cyclePlayer(cycleForward) {
+    cyclePlayer() {
         var player;
         this.currentPlayer.animations.stop(null, true)
-        if(cycleForward){
-            player = this.players.next();
-            if(player == this.currentPlayer)
-                this.currentPlayer = this.players.next();
-            else
-                this.currentPlayer = player;
-        } else {
-            player = this.players.previous()
-            if(player == this.currentPlayer) this.currentPlayer = this.players.previous();
-            else this.currentPlayer = player;
-        }
+        player = this.players.next();
+        if(player == this.currentPlayer)
+            this.currentPlayer = this.players.next();
+        else
+            this.currentPlayer = player;
         this.game.camera.follow(this.currentPlayer);
         this.currentPlayer.animations.play('current', 8, true);
         this.lockedLeft = null;

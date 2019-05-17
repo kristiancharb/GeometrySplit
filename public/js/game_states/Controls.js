@@ -22,7 +22,7 @@ GeometrySplit.Controls.prototype = {
         GeometrySplit.game.add.text(30, 300-100, 'Move: Arrow Keys', {});
         GeometrySplit.game.add.text(30, 300-50, 'Jump: Space', {});
         GeometrySplit.game.add.text(30, 300+0, 'Split: R', {});
-        GeometrySplit.game.add.text(30, 300+50, 'Swap: Q & E', {});
+        GeometrySplit.game.add.text(30, 300+50, 'Swap: E', {});
         GeometrySplit.game.add.text(30, 300+100, 'Pause: P', {});
     },
 };
